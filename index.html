@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#160d2e">
+<title>Квіз</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { font-size: 17px; }
+  #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+  .top { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--muted); font-weight: 600; min-height: 28px; gap: 10px; }
+  .top .me { font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top .pts { color: var(--gold); font-weight: 800; white-space: nowrap; }
+  .scr { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 14px; min-height: 0; }
+  h1 { font-size: 30px; line-height: 1.1; margin: 0; font-weight: 900; }
+  .sub { color: var(--muted); font-size: 17px; }
+  .big { font-size: 64px; line-height: 1; }
+  input { font: inherit; font-size: 22px; font-weight: 700; text-align: center; padding: 16px; border-radius: 18px; border: 2px solid var(--line); background: rgba(255,255,255,.95); color: #1a1033; width: 100%; outline: none; }
+  input:focus { border-color: var(--gold); }
+  .btn { font-size: 20px; padding: 16px; width: 100%; }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0; }
+  .grid.n2 { grid-template-columns: 1fr; }
+  .opt { border-radius: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px; font-size: 18px; font-weight: 800; line-height: 1.15; box-shadow: 0 6px 0 rgba(0,0,0,.25); transition: transform .08s; overflow-wrap: anywhere; }
+  .opt:active { transform: translateY(4px) scale(.98); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .opt .letter { font-size: 22px; }
+  .qtext { font-size: 18px; font-weight: 700; text-align: center; margin: 4px 0 12px; line-height: 1.2; }
+  .tbar { height: 8px; border-radius: 9px; background: var(--card); overflow: hidden; margin-bottom: 12px; }
+  .tbar i { display: block; height: 100%; background: var(--gold); width: 100%; }
+  .result { border-radius: 28px; padding: 30px 18px; }
+  .result.ok { background: linear-gradient(160deg, #2ad4a0, #129a73); }
+  .result.bad { background: linear-gradient(160deg, #ff6b81, #c9304a); }
+  .result.none { background: var(--card); border: 1px solid var(--line); }
+  .result h2 { font-size: 34px; margin: 6px 0; font-weight: 900; }
+  .result .gain { font-size: 26px; font-weight: 900; background: rgba(0,0,0,.18); display: inline-block; padding: 6px 18px; border-radius: 999px; margin-top: 8px; }
+  .place { font-size: 20px; font-weight: 700; }
+  .place b { color: var(--gold); font-size: 30px; }
+  .dots i { display: inline-block; width: 10px; height: 10px; margin: 0 4px; border-radius: 50%; background: var(--gold); animation: bounce 1s infinite; }
+  .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 50% { transform: translateY(-10px); opacity: .5; } }
+  .medal { font-size: 110px; line-height: 1; }
+  .warn { color: var(--gold); font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div>
+<div id="app">
+  <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
+  <div class="scr" id="scr"></div>
+</div>
+<script src="lib/mqtt.min.js"></script>
+<script src="common.js"></script>
+<script>
+const { Sfx, esc, params } = VQ;
+const LETTERS = ['A', 'Б', 'В', 'Г'];
+const scr = document.getElementById('scr');
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+const room = (params.get('r') || '').toUpperCase().replace(/[^A-Z]/g, '');
+let myId = ls.get('vq_id'); if (!myId) { myId = VQ.rid(14); ls.set('vq_id', myId); }
+let myName = ls.get('vq_name') || '';
+const JK = 'vq_joined_' + room;
+let joined = ls.get(JK) === '1', confirmed = false;
+let S = null, shownKey = '', deadline = 0, myAns = {}, resendT = null, net = null, status = 'connecting', tbar = null;
+
+function vib(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+function setTop() {
+  document.getElementById('me').innerHTML = `<span class="dot ${status}"></span>` + (joined && myName ? esc((S && S.pl && S.pl[myId]) || myName) : (status === 'online' ? 'На зв\'язку' : 'Підключення…'));
+  const r = S && S.res && S.res[myId];
+  document.getElementById('pts').textContent = r ? r[2] + ' балів' : '';
+}
+
+/* ---------- Без коду кімнати ---------- */
+if (!room) {
+  scr.innerHTML = `<div class="big pop">🎯</div><h1>Введи код гри</h1><div class="sub">Він на великому екрані під QR-кодом</div>
+    <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="КОД"><button class="btn" id="go">Далі</button>`;
+  const go = () => { const c = document.getElementById('code').value.trim().toUpperCase().replace(/[^A-Z]/g, ''); if (c.length >= 4) location.search = '?r=' + c; };
+  document.getElementById('go').onclick = go;
+  document.getElementById('code').onkeydown = e => { if (e.key === 'Enter') go(); };
+  document.getElementById('me').textContent = '';
+} else {
+  scr.innerHTML = `<div class="dots"><i></i><i></i><i></i></div><div class="sub">Підключаємось до гри…</div>`;
+  net = VQ.connect({
+    idx: +(params.get('b') || 0), subs: [VQ.topic(room) + '/s'],
+    onStatus: s => { status = s; setTop(); },
+    onConnect: () => { if (joined && myName) sendJoin(); },
+    onMessage: (t, m) => onState(m)
+  });
+  setTimeout(() => { if (!S) scr.innerHTML = `<div class="big">😕</div><h1>Гру не знайдено</h1><div class="sub">Перевір інтернет або відскануй QR-код ще раз</div><button class="btn ghost" onclick="location.reload()">Спробувати ще</button>`; }, 15000);
+}
+function sendJoin() { net && net.pub(VQ.topic(room) + '/p', { t: 'join', id: myId, name: myName }); }
+function sendAns(i, a) { net && net.pub(VQ.topic(room) + '/p', { t: 'ans', id: myId, q: i, a }); }
+
+function onState(m) {
+  if (!m) { if (S) { S = null; scr.innerHTML = `<div class="big">👋</div><h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
+  const first = !S; S = m;
+  if (joined && S.pl[myId]) confirmed = true;
+  if (joined && confirmed && !S.pl[myId]) { joined = false; confirmed = false; ls.del(JK); }
+  if (joined && !S.pl[myId] && first) sendJoin();
+  if (S.ph === 'question' && typeof S.left === 'number') {
+    const d = performance.now() + S.left;
+    if (shownKey !== 'question' + S.i || d < deadline) deadline = d;
+  }
+  setTop(); show();
+}
+
+function show() {
+  if (!joined) return shownKey === 'join' ? null : renderJoin();
+  if (!S.pl[myId]) { if (shownKey !== 'wait-join') { shownKey = 'wait-join'; scr.innerHTML = `<div class="dots"><i></i><i></i><i></i></div><div class="sub">Заходимо в гру…</div>`; } return; }
+  const key = S.ph + (S.i ?? '') + (S.ph === 'question' ? (myAns[S.i] != null ? 'a' : '') : '');
+  if (S.ph === 'question' && myAns[S.i] != null) {
+    if (S.ans && S.ans.includes(myId)) clearInterval(resendT);
+  }
+  if (key === shownKey) { const c = document.getElementById('cnt'); if (c) c.textContent = Object.keys(S.pl).length; return; }
+  shownKey = key; clearInterval(tbar);
+  const ph = S.ph, n = Object.keys(S.pl).length;
+  if (ph === 'lobby') {
+    scr.innerHTML = `<div class="big pop">🎉</div><h1 class="rise">Ти в грі!</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
+      <button class="btn ghost" id="rename" style="margin-top:20px">Змінити ім'я</button>`;
+    document.getElementById('rename').onclick = () => { joined = false; ls.del(JK); renderJoin(); };
+    return;
+  }
+  if (ph === 'intro') {
+    scr.innerHTML = `<div class="sub">Питання ${S.i + 1} з ${S.n}</div><div class="big pop">⚡</div><h1 class="rise">Готуйся!</h1>`;
+    vib(60); return;
+  }
+  if (ph === 'question') {
+    const q = S.q;
+    if (myAns[S.i] != null) {
+      scr.innerHTML = `<div class="big pop">🤞</div><h1>Відповідь прийнята</h1><div class="sub">Чекаємо на інших…</div>`;
+      return;
+    }
+    scr.style.justifyContent = 'stretch';
+    scr.innerHTML = `<div class="tbar"><i id="tb"></i></div><div class="qtext">${esc(q.text)}</div>
+      <div class="grid ${q.a.length === 2 ? 'n2' : ''}">${q.a.map((a, i) => `<button class="opt ans${i} pop" style="animation-delay:${i * 60}ms" data-i="${i}"><span class="letter">${LETTERS[i]}</span><span>${esc(a)}</span></button>`).join('')}</div>`;
+    const tb = document.getElementById('tb'), total = q.time * 1000;
+    const upd = () => { const left = Math.max(0, deadline - performance.now()); tb.style.width = (left / total * 100) + '%'; };
+    upd(); tbar = setInterval(upd, 100);
+    scr.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const i = S.i, a = +b.dataset.i; if (myAns[i] != null) return;
+      myAns[i] = a; vib(30); Sfx.init(); Sfx.pop();
+      sendAns(i, a); clearInterval(resendT);
+      resendT = setInterval(() => { if (S.ph === 'question' && S.i === i && !(S.ans || []).includes(myId)) sendAns(i, a); else clearInterval(resendT); }, 1500);
+      scr.style.justifyContent = ''; show();
+    });
+    return;
+  }
+  scr.style.justifyContent = '';
+  const r = S.res && S.res[myId];
+  if (ph === 'reveal') {
+    if (!r) { scr.innerHTML = `<h1>Чекаємо…</h1>`; return; }
+    const [ok, gain, , rank] = r, cor = S.q.a[S.cor];
+    if (ok === 1) { Sfx.init(); Sfx.correct(); vib([40, 60, 40]); }
+    else if (ok === 0) { Sfx.init(); Sfx.wrong(); vib(300); }
+    scr.innerHTML = `<div class="result ${ok === 1 ? 'ok' : ok === 0 ? 'bad' : 'none'} pop ${ok === 0 ? 'shake' : ''}">
+      <div class="big">${ok === 1 ? '🎉' : ok === 0 ? '😬' : '🙈'}</div>
+      <h2>${ok === 1 ? 'Правильно!' : ok === 0 ? 'Мимо' : 'Не встиг'}</h2>
+      ${ok === 1 ? `<div class="gain">+${gain}</div>` : `<div class="sub" style="color:#fff">Правильна відповідь:<br><b>${esc(cor)}</b></div>`}
+    </div><div class="place rise">Ти на <b>${rank}</b> місці</div>`;
+    return;
+  }
+  if (ph === 'board') {
+    scr.innerHTML = `<div class="big pop">📊</div><div class="place">Ти на <b>${r ? r[3] : '—'}</b> місці</div><div class="sub">${r ? r[2] : 0} балів</div><div class="sub">Наступне питання вже скоро</div>`;
+    return;
+  }
+  if (ph === 'final') {
+    const rank = r ? r[3] : null, medal = { 1: '🥇', 2: '🥈', 3: '🥉' }[rank];
+    scr.innerHTML = `<div class="dots"><i></i><i></i><i></i></div><h1>Хто ж переможе?</h1><div class="sub">Дивись на екран!</div>`;
+    setTimeout(() => {
+      if (S.ph !== 'final') return;
+      scr.innerHTML = medal
+        ? `<div class="medal pop">${medal}</div><h1 class="rise">${rank} місце!</h1><div class="sub">${r[2]} балів. Ти супер!</div>`
+        : `<div class="big pop">🙌</div><h1 class="rise">Твоє місце: ${rank ?? '—'}</h1><div class="sub">${r ? r[2] : 0} балів. Дякуємо за гру!</div>`;
+      if (medal) { VQ.confetti(6000, 160); vib([80, 80, 200]); }
+    }, 9400);
+  }
+}
+
+function renderJoin() {
+  shownKey = 'join';
+  scr.innerHTML = `<div class="big pop">👋</div><h1 class="rise">${esc((S && S.title) || 'Квіз')}</h1><div class="sub">Як тебе звати?</div>
+    <input id="nm" maxlength="20" autocomplete="off" placeholder="Твоє ім'я" value="${esc(myName)}">
+    <button class="btn" id="go">Увійти в гру</button><div class="warn" id="w"></div>`;
+  const nm = document.getElementById('nm');
+  const go = () => {
+    const v = nm.value.replace(/\s+/g, ' ').trim();
+    if (!v) { nm.classList.remove('shake'); void nm.offsetWidth; nm.classList.add('shake'); return; }
+    Sfx.init();
+    myName = v.slice(0, 20); ls.set('vq_name', myName); joined = true; confirmed = false; ls.set(JK, '1');
+    sendJoin(); shownKey = ''; setTop();
+    if (S) show();
+  };
+  document.getElementById('go').onclick = go;
+  nm.onkeydown = e => { if (e.key === 'Enter') go(); };
+}
+</script>
+</body>
+</html>

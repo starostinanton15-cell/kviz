@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Квіз · екран ведучого</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { font-size: clamp(14px, 1.6vmin, 22px); }
+  #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: 3vmin 4vmin; }
+  .top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-weight: 600; min-height: 2.4em; }
+  .top .tools { display: flex; gap: .6em; }
+  .top .tools button { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .45em 1em; font-weight: 600; }
+  .stage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .center { flex: 1; display: grid; place-items: center; text-align: center; }
+
+  /* Лобі */
+  .lobby { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 5vmin; align-items: center; min-height: 0; }
+  .qrcard { background: #fff; color: #1a1033; border-radius: 28px; padding: 2.4vmin; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  .qrcard svg { width: 42vmin; height: 42vmin; display: block; }
+  .qrcard .code { font-size: 4.2vmin; font-weight: 900; letter-spacing: .12em; margin-top: 1vmin; }
+  .qrcard .url { font-size: 1.7vmin; color: #6a5c85; word-break: break-all; max-width: 42vmin; margin: .3vmin auto 0; }
+  .lobby h1 { font-size: 6.5vmin; line-height: 1.05; margin: 0 0 1.5vmin; font-weight: 900; }
+  .lobby .hint { font-size: 2.8vmin; color: var(--muted); margin-bottom: 3vmin; }
+  .count { font-size: 2.6vmin; font-weight: 700; margin-bottom: 1.5vmin; }
+  .count b { color: var(--gold); font-size: 5vmin; vertical-align: -0.2em; margin-right: .2em; }
+  .names { display: flex; flex-wrap: wrap; gap: 1vmin; max-height: 34vmin; overflow: hidden; align-content: flex-start; }
+  .chip { background: var(--card); border: 1px solid var(--line); padding: .7vmin 1.8vmin; border-radius: 999px; font-size: 2.4vmin; font-weight: 700; cursor: pointer; }
+  .chip:hover { background: rgba(255,93,115,.3); }
+  .bottom { display: flex; gap: 1.2vmin; align-items: center; justify-content: center; padding-top: 2vmin; }
+  .bottom .btn { font-size: 2.6vmin; }
+
+  /* Інтро */
+  .intro .num { font-size: 3.4vmin; color: var(--gold); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .intro .qt { font-size: 7vmin; font-weight: 900; max-width: 85vw; line-height: 1.1; margin-top: 2vmin; }
+  .introbar { width: 50vmin; height: 1vmin; background: var(--card); border-radius: 9px; margin: 4vmin auto 0; overflow: hidden; }
+  .introbar i { display: block; height: 100%; background: var(--gold); animation: fill 3s linear both; }
+  @keyframes fill { from { width: 0; } to { width: 100%; } }
+
+  /* Питання */
+  .qhead { background: rgba(255,255,255,.95); color: #1a1033; border-radius: var(--r); padding: 2.4vmin 3vmin; font-size: 4.6vmin; font-weight: 800; text-align: center; line-height: 1.15; box-shadow: 0 10px 40px rgba(0,0,0,.3); }
+  .qmid { flex: 1; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 0; padding: 2vmin 0; }
+  .timer { position: relative; width: 22vmin; height: 22vmin; justify-self: start; }
+  .timer svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .timer circle { fill: none; stroke-width: 9; }
+  .timer .tn { position: absolute; inset: 0; display: grid; place-items: center; font-size: 8vmin; font-weight: 900; }
+  .timer.low .tn { color: var(--bad); animation: pulse .5s infinite; }
+  .answered { justify-self: end; text-align: center; }
+  .answered b { display: block; font-size: 9vmin; font-weight: 900; line-height: 1; }
+  .answered span { color: var(--muted); font-size: 2.4vmin; font-weight: 600; }
+  .bars { display: flex; gap: 3vmin; align-items: flex-end; height: 26vmin; }
+  .bar { width: 10vmin; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar i { display: block; width: 100%; border-radius: 12px 12px 4px 4px; height: 0; transition: height .9s cubic-bezier(.2,.9,.3,1); }
+  .bar b { font-size: 3.4vmin; margin-bottom: .6vmin; }
+  .bar.dim { opacity: .35; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6vmin; }
+  .opt { display: flex; align-items: center; gap: 2vmin; padding: 2.2vmin 2.6vmin; border-radius: var(--r); font-size: 3.6vmin; font-weight: 800; min-height: 11vmin; transition: opacity .4s, transform .4s, filter .4s; box-shadow: 0 6px 0 rgba(0,0,0,.25); }
+  .opt.dim { opacity: .28; filter: grayscale(.6); transform: scale(.97); }
+  .opt.win { transform: scale(1.03); box-shadow: 0 0 0 .6vmin #fff, 0 0 40px rgba(255,255,255,.5); }
+  .opt .mark { margin-left: auto; font-size: 4vmin; }
+
+  /* Таблиця */
+  .board h2 { font-size: 5.4vmin; text-align: center; margin: 1vmin 0 3vmin; font-weight: 900; }
+  .rows { width: min(1100px, 86vw); margin: 0 auto; display: flex; flex-direction: column; gap: 1.4vmin; }
+  .row { display: flex; align-items: center; gap: 2vmin; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 1.6vmin 2.4vmin; font-size: 3.4vmin; font-weight: 800; }
+  .row .pl { width: 1.8em; height: 1.8em; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.12); flex: none; }
+  .row:nth-child(1) .pl { background: var(--gold); color: #2a1640; }
+  .row:nth-child(2) .pl { background: #d9dde6; color: #2a1640; }
+  .row:nth-child(3) .pl { background: #e0965a; color: #2a1640; }
+  .row .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .sc { color: var(--gold); }
+  .row .up { color: var(--ok); font-size: .7em; }
+
+  /* П'єдестал */
+  .podium { flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 2.4vmin; padding-bottom: 2vmin; }
+  .col { width: 26vmin; display: flex; flex-direction: column; align-items: center; opacity: 0; }
+  .col.show { opacity: 1; }
+  .col .who { text-align: center; margin-bottom: 1.6vmin; }
+  .col .who .nm { font-size: 4vmin; font-weight: 900; max-width: 30vmin; overflow-wrap: anywhere; }
+  .col .who .sc { font-size: 2.6vmin; color: var(--gold); font-weight: 700; }
+  .col .block { width: 100%; border-radius: 18px 18px 0 0; display: grid; place-items: start center; padding-top: 2vmin; font-size: 9vmin; font-weight: 900; color: rgba(0,0,0,.35); height: 0; transition: height 1s cubic-bezier(.2,.9,.3,1); }
+  .col.p1 .block { background: linear-gradient(#ffe08a, #f2b632); }
+  .col.p2 .block { background: linear-gradient(#f1f3f7, #b9c0cc); }
+  .col.p3 .block { background: linear-gradient(#f4b98a, #c97a3e); }
+  .col.show.p1 .block { height: 44vmin; } .col.show.p2 .block { height: 32vmin; } .col.show.p3 .block { height: 22vmin; }
+  .crown { font-size: 7vmin; animation: pulse 1.2s infinite; }
+  .finaltitle { text-align: center; font-size: 5.4vmin; font-weight: 900; margin: 1vmin 0 0; }
+
+  /* Редактор */
+  .modal { position: fixed; inset: 0; background: rgba(10,5,25,.85); backdrop-filter: blur(6px); display: none; z-index: 50; padding: 3vmin; }
+  .modal.on { display: flex; }
+  .ed { margin: auto; width: min(1100px, 100%); height: 100%; display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: auto 1fr auto; gap: 14px; background: #21153f; border: 1px solid var(--line); border-radius: 24px; padding: 20px; font-size: 15px; }
+  .ed h3 { grid-column: 1/-1; margin: 0; font-size: 22px; }
+  .ed textarea { width: 100%; height: 100%; resize: none; background: #120a26; color: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; font: 15px/1.5 ui-monospace, Consolas, monospace; }
+  .ed .help { overflow: auto; color: var(--muted); line-height: 1.5; }
+  .ed .help code { background: rgba(255,255,255,.1); padding: 1px 6px; border-radius: 6px; color: #fff; }
+  .ed .status { font-weight: 700; margin: 0 0 8px; }
+  .ed .status.ok { color: var(--ok); } .ed .status.err { color: var(--bad); }
+  .ed .acts { grid-column: 1/-1; display: flex; gap: 10px; flex-wrap: wrap; }
+  .ed .acts .btn { font-size: 15px; padding: .7em 1.3em; }
+  .ed .acts .sp { flex: 1; }
+  .toast { position: fixed; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
+</style>
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div>
+<div id="app">
+  <div class="top">
+    <div id="conn"><span class="dot connecting"></span>Підключення…</div>
+    <div class="tools">
+      <button id="bSound" title="Звук (M)">🔊 Звук</button>
+      <button id="bFull" title="На весь екран (F)">⛶ Екран</button>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="bottom" id="bottom"></div>
+</div>
+
+<div class="modal" id="editor">
+  <div class="ed">
+    <h3>Питання для квізу</h3>
+    <textarea id="edText" spellcheck="false"></textarea>
+    <div class="help">
+      <p class="status" id="edStatus"></p>
+      <p><code>Назва: …</code> заголовок на екрані.<br><code>Час: 20</code> секунд на питання.</p>
+      <p>Кожне питання з нового рядка, під ним відповіді:<br>
+        <code>+ правильна</code><br><code>- неправильна</code></p>
+      <p>Від 2 до 4 відповідей, правильна одна. Порожній рядок між питаннями.</p>
+      <p>Свій час для одного питання: <code>[30]</code> у кінці рядка з питанням.</p>
+      <p>Питання зберігаються на цьому комп'ютері в цьому браузері. Для іншого заходу просто заміни текст. Щоб зберегти копію про запас, натисни «Скачати файл».</p>
+    </div>
+    <div class="acts">
+      <button class="btn" id="edSave">Зберегти</button>
+      <button class="btn ghost" id="edClose">Скасувати</button>
+      <span class="sp"></span>
+      <button class="btn ghost" id="edExport">Скачати файл</button>
+      <button class="btn ghost" id="edImport">Відкрити файл</button>
+      <button class="btn ghost" id="edDefault">Шаблон</button>
+      <input type="file" id="edFile" accept=".txt,text/plain" hidden>
+    </div>
+  </div>
+</div>
+
+<script src="lib/mqtt.min.js"></script>
+<script src="lib/qrcode.js"></script>
+<script src="common.js"></script>
+<script src="questions.js"></script>
+<script>
+const { Sfx, esc } = VQ;
+const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
+const LETTERS = ['A', 'Б', 'В', 'Г'];
+const INTRO_MS = 3000;
+const $ = s => document.querySelector(s);
+const stage = $('#stage'), bottom = $('#bottom');
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+/* ---------- Питання: розбір тексту ---------- */
+function parseQuiz(text) {
+  const out = { title: 'Квіз', time: 20, qs: [] }, errs = [];
+  let cur = null;
+  text.split(/\r?\n/).forEach((raw, ln) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('//')) return;
+    let m;
+    if ((m = line.match(/^назва\s*:\s*(.*)$/i))) { out.title = m[1].trim() || out.title; return; }
+    if ((m = line.match(/^час\s*:\s*(\d+)/i))) { out.time = Math.min(120, Math.max(5, +m[1])); return; }
+    if ((m = line.match(/^([+\-–—])\s*(.+)$/))) {
+      if (!cur) { errs.push(`Рядок ${ln + 1}: відповідь без питання`); return; }
+      cur.a.push(m[2].trim()); if (m[1] === '+') cur.c.push(cur.a.length - 1); return;
+    }
+    let q = line.replace(/^\d+\s*[.)]\s*/, ''), t = null;
+    if ((m = q.match(/\[(\d+)\]\s*$/))) { t = Math.min(120, Math.max(5, +m[1])); q = q.slice(0, m.index).trim(); }
+    cur = { q, a: [], c: [], t, ln: ln + 1 }; out.qs.push(cur);
+  });
+  out.qs.forEach((q, i) => {
+    const n = `Питання ${i + 1} («${q.q.slice(0, 30)}${q.q.length > 30 ? '…' : ''}»)`;
+    if (q.a.length < 2) errs.push(`${n}: треба хоча б 2 відповіді`);
+    if (q.a.length > 4) errs.push(`${n}: більше 4 відповідей`);
+    if (q.c.length !== 1) errs.push(`${n}: правильна відповідь має бути рівно одна (зараз ${q.c.length})`);
+  });
+  if (!out.qs.length) errs.push('Немає жодного питання');
+  out.qs = out.qs.map(q => ({ q: q.q, a: q.a.slice(0, 4), c: q.c[0], t: q.t || out.time }));
+  return { quiz: out, errs };
+}
+const quizText = () => ls.get(LS_Q) || DEFAULT_QUESTIONS;
+
+/* ---------- Стан гри ---------- */
+let G = null;
+function newGame() {
+  const p = parseQuiz(quizText());
+  const code = Array.from(crypto.getRandomValues(new Uint8Array(5)), b => 'ABCDEFGHJKLMNPRSTUVWXYZ'[b % 23]).join('');
+  G = { room: code, broker: 0, title: p.quiz.title, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
+  save();
+}
+function save() { ls.set(LS_GAME, JSON.stringify(G)); }
+try { G = JSON.parse(ls.get(LS_GAME)); } catch (e) { G = null; }
+if (!G || !G.room) newGame();
+
+function ranking() {
+  const arr = Object.entries(G.players).map(([id, p]) => ({ id, name: p.name, score: p.score }));
+  arr.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+  let r = 0, last = null;
+  arr.forEach((p, i) => { if (p.score !== last) { r = i + 1; last = p.score; } p.rank = r; });
+  return arr;
+}
+
+/* ---------- Зв'язок ---------- */
+let net = null, pubTimer = null;
+const base = () => VQ.topic(G.room);
+function startNet() {
+  if (net && net.client) net.client.end(true);
+  net = VQ.connect({
+    idx: G.broker, tryAll: true, subs: [base() + '/p'],
+    onStatus: s => { $('#conn').innerHTML = `<span class="dot ${s}"></span>` + ({ online: 'На зв\'язку', connecting: 'Підключення…', offline: 'Немає інтернету, перепідключаюсь…' }[s]); },
+    onConnect: i => { if (G.broker !== i) { G.broker = i; save(); if (G.phase === 'lobby') render(); } publish(); },
+    onMessage: (t, m) => m && onPlayer(m)
+  });
+}
+function publish() {
+  if (!net) return;
+  const s = { v: 1, ph: G.phase, title: G.title, n: G.qs.length, i: G.qi, pl: {}, ts: Date.now() };
+  for (const id in G.players) s.pl[id] = G.players[id].name;
+  const q = G.qs[G.qi];
+  if (q && ['intro', 'question', 'reveal'].includes(G.phase)) s.q = { text: q.q, a: q.a, time: q.t };
+  if (G.phase === 'intro') s.left = Math.max(0, G.qStart - Date.now());
+  if (G.phase === 'question') { s.left = Math.max(0, G.qEnd - Date.now()); s.ans = Object.keys(G.answers); }
+  if (G.phase === 'reveal') { s.cor = q.c; s.cnt = counts(); }
+  if (['reveal', 'board', 'final'].includes(G.phase)) {
+    s.res = {};
+    ranking().forEach(p => { const a = G.answers[p.id]; s.res[p.id] = [a ? (a.a === q?.c ? 1 : 0) : -1, a ? a.pts : 0, p.score, p.rank]; });
+    if (G.phase === 'final') s.res = Object.fromEntries(ranking().map(p => [p.id, [0, 0, p.score, p.rank]]));
+  }
+  net.pub(base() + '/s', s, { retain: true });
+}
+const publishSoon = () => { if (!pubTimer) pubTimer = setTimeout(() => { pubTimer = null; publish(); }, 400); };
+function counts() { const c = [0, 0, 0, 0]; for (const id in G.answers) c[G.answers[id].a]++; return c; }
+
+function onPlayer(m) {
+  if (!m || typeof m.id !== 'string' || m.id.length > 40) return;
+  if (m.t === 'join') {
+    let name = String(m.name || '').replace(/\s+/g, ' ').trim().slice(0, 20);
+    if (!name) return;
+    const p = G.players[m.id];
+    if (p) { if (p.name !== name && G.phase === 'lobby') { p.name = uniq(name, m.id); save(); lobbyNames(); } publishSoon(); return; }
+    G.players[m.id] = { name: uniq(name, m.id), score: 0 };
+    save(); Sfx.pop(); if (G.phase === 'lobby') lobbyNames(); publishSoon();
+  } else if (m.t === 'ans') {
+    if (G.phase !== 'question' || m.q !== G.qi || !G.players[m.id]) { publishSoon(); return; }
+    if (G.answers[m.id]) { publishSoon(); return; }
+    const q = G.qs[G.qi], a = m.a | 0;
+    if (a < 0 || a >= q.a.length) return;
+    const now = Date.now(); if (now > G.qEnd + 600) return;
+    const el = Math.min(1, Math.max(0, (now - (G.qEnd - q.t * 1000)) / (q.t * 1000)));
+    const pts = a === q.c ? Math.round(1000 * (1 - el / 2)) : 0;
+    G.answers[m.id] = { a, pts };
+    save(); updateAnswered(); publishSoon();
+    const total = Object.keys(G.players).length;
+    if (Object.keys(G.answers).length >= total) setTimeout(() => { if (G.phase === 'question') endQuestion(); }, 700);
+  }
+}
+function uniq(name, id) {
+  const taken = new Set(Object.entries(G.players).filter(([k]) => k !== id).map(([, p]) => p.name.toLowerCase()));
+  if (!taken.has(name.toLowerCase())) return name;
+  for (let i = 2; ; i++) if (!taken.has((name + ' ' + i).toLowerCase())) return name + ' ' + i;
+}
+
+/* ---------- Хід гри ---------- */
+function next() {
+  Sfx.init();
+  if (G.phase === 'lobby') { if (!G.qs.length) return; G.qi = 0; return goIntro(); }
+  if (G.phase === 'intro') return startQuestion();
+  if (G.phase === 'question') return endQuestion();
+  if (G.phase === 'reveal') {
+    if (G.qi >= G.qs.length - 1) return goFinal();
+    G.phase = 'board'; save(); render(); publish(); return;
+  }
+  if (G.phase === 'board') { G.qi++; return goIntro(); }
+}
+let tmr = null;
+function goIntro() {
+  G.phase = 'intro'; G.answers = {}; G.qStart = Date.now() + INTRO_MS; save(); render(); publish();
+  Sfx.stopLoop(); Sfx.whoosh();
+  clearTimeout(tmr); tmr = setTimeout(() => { if (G.phase === 'intro') startQuestion(); }, INTRO_MS);
+}
+function startQuestion() {
+  clearTimeout(tmr);
+  const q = G.qs[G.qi];
+  G.phase = 'question'; G.answers = {}; G.qEnd = Date.now() + q.t * 1000; save(); render(); publish();
+  Sfx.loop('think'); Sfx.tempo = 1;
+}
+function endQuestion() {
+  if (G.phase !== 'question') return;
+  const rk = ranking(); G.prevRank = Object.fromEntries(rk.map(p => [p.id, p.rank]));
+  for (const id in G.answers) if (G.players[id]) G.players[id].score += G.answers[id].pts;
+  G.phase = 'reveal'; save(); Sfx.stopLoop(); Sfx.gong();
+  render(); publish();
+  setTimeout(() => Sfx.correct(), 700);
+}
+function goFinal() { G.phase = 'final'; save(); Sfx.stopLoop(); render(); publish(); }
+
+/* ---------- Відображення ---------- */
+function playerUrl() {
+  const u = new URL('./', location.href);
+  u.search = '?r=' + G.room + (G.broker ? '&b=' + G.broker : '') + (VQ.params.get('broker') ? '&broker=' + encodeURIComponent(VQ.params.get('broker')) : '');
+  return u.href;
+}
+function qrSvg(text) { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
+let tick = null;
+function render() {
+  clearInterval(tick); bottom.innerHTML = '';
+  const ph = G.phase, q = G.qs[G.qi];
+  if (ph === 'lobby') {
+    const url = playerUrl(), n = Object.keys(G.players).length;
+    stage.innerHTML = `<div class="lobby">
+      <div class="qrcard pop">${qrSvg(url)}<div class="code">${G.room}</div><div class="url">${esc(url.replace(/^https?:\/\//, ''))}</div></div>
+      <div><h1 class="rise">${esc(G.title)}</h1>
+        <div class="hint">Скануй QR-код камерою телефону і впиши своє ім'я</div>
+        <div class="count" id="cnt"></div>
+        <div class="names" id="names"></div>
+      </div></div>`;
+    lobbyNames();
+    bottom.innerHTML = `<button class="btn" id="bStart">▶ Почати квіз</button>
+      <button class="btn ghost" id="bEdit">✎ Питання (${G.qs.length})</button>
+      <button class="btn ghost" id="bNew">↺ Нова гра</button>`;
+    $('#bStart').onclick = next;
+    $('#bEdit').onclick = openEditor;
+    $('#bNew').onclick = () => { if (confirm('Почати нову гру? Гравці і бали обнуляться, з\'явиться новий QR-код.')) { net && net.pub(base() + '/s', null, { retain: true }); newGame(); startNet(); render(); } };
+    return;
+  }
+  if (ph === 'intro') {
+    stage.innerHTML = `<div class="center intro"><div>
+      <div class="num pop">Питання ${G.qi + 1} з ${G.qs.length}</div>
+      <div class="qt rise">${esc(q.q)}</div>
+      <div class="introbar"><i style="animation-duration:${INTRO_MS}ms"></i></div></div></div>`;
+    bottom.innerHTML = `<button class="btn ghost" id="bNext">Далі ›</button>`; $('#bNext').onclick = next;
+    return;
+  }
+  if (ph === 'question' || ph === 'reveal') {
+    const rev = ph === 'reveal', c = counts(), mx = Math.max(1, ...c);
+    stage.innerHTML = `<div class="qhead ${rev ? '' : 'pop'}">${esc(q.q)}</div>
+      <div class="qmid">${rev ? '<div></div>' : `<div class="timer" id="timer"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" stroke="rgba(255,255,255,.12)"/><circle id="tc" cx="50" cy="50" r="44" stroke="#ffd166" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg><div class="tn" id="tn">${q.t}</div></div>`}
+        ${rev ? `<div class="bars">${q.a.map((_, i) => `<div class="bar ${i === q.c ? '' : 'dim'}"><b>${c[i]}</b><i class="ans${i}" data-h="${Math.max(4, c[i] / mx * 100)}"></i></div>`).join('')}</div>` : '<div></div>'}
+        <div class="answered"><b id="ansN">${Object.keys(G.answers).length}</b><span>відповідей</span></div></div>
+      <div class="grid">${q.a.map((a, i) => `<div class="opt ans${i} ${rev ? (i === q.c ? 'win' : 'dim') : 'rise'}" style="animation-delay:${i * 80}ms"><span class="letter">${LETTERS[i]}</span><span>${esc(a)}</span>${rev && i === q.c ? '<span class="mark pop">✓</span>' : ''}</div>`).join('')}</div>`;
+    if (rev) {
+      requestAnimationFrame(() => requestAnimationFrame(() => stage.querySelectorAll('.bar i').forEach(b => b.style.height = b.dataset.h + '%')));
+      bottom.innerHTML = `<button class="btn" id="bNext">${G.qi >= G.qs.length - 1 ? '🏆 До п\'єдесталу' : 'Таблиця лідерів ›'}</button>`;
+      $('#bNext').onclick = next;
+    } else {
+      let lastS = null;
+      const upd = () => {
+        const left = Math.max(0, G.qEnd - Date.now()), s = Math.ceil(left / 1000);
+        $('#tn').textContent = s; $('#tc').style.strokeDashoffset = 276.5 * (1 - left / (q.t * 1000));
+        if (s !== lastS) { lastS = s; if (s <= 5 && s > 0) { $('#timer').classList.add('low'); Sfx.tick(s <= 3); Sfx.tempo = 1.25; } }
+        if (left <= 0) endQuestion();
+      };
+      upd(); tick = setInterval(upd, 100);
+      bottom.innerHTML = `<button class="btn ghost" id="bNext">Зупинити час ›</button>`; $('#bNext').onclick = next;
+    }
+    return;
+  }
+  if (ph === 'board') {
+    const rk = ranking().slice(0, 5);
+    stage.innerHTML = `<div class="board"><h2 class="pop">Таблиця лідерів</h2><div class="rows">${rk.map((p, i) => {
+      const up = (G.prevRank[p.id] || 99) - p.rank;
+      return `<div class="row rise" style="animation-delay:${i * 120}ms"><span class="pl">${p.rank}</span><span class="nm">${esc(p.name)}</span>${up > 0 && G.qi > 0 ? `<span class="up">▲${up}</span>` : ''}<span class="sc" data-v="${p.score}">0</span></div>`;
+    }).join('') || '<div class="row">Поки що нікого</div>'}</div></div>`;
+    countUp(); Sfx.loop('lobby');
+    bottom.innerHTML = `<button class="btn" id="bNext">Наступне питання ›</button>`; $('#bNext').onclick = next;
+    return;
+  }
+  if (ph === 'final') {
+    const rk = ranking(), top = [rk[1], rk[0], rk[2]];
+    stage.innerHTML = `<div class="finaltitle pop">${esc(G.title)}: переможці</div><div class="podium">${top.map((p, k) => {
+      const pl = [2, 1, 3][k];
+      return `<div class="col p${pl}" id="col${pl}"><div class="who">${pl === 1 ? '<div class="crown">👑</div>' : ''}<div class="nm">${p ? esc(p.name) : '—'}</div><div class="sc">${p ? p.score + ' балів' : ''}</div></div><div class="block">${pl}</div></div>`;
+    }).join('')}</div>`;
+    const show = (n, d) => setTimeout(() => { $('#col' + n).classList.add('show'); }, d);
+    Sfx.drumroll(2); show(3, 2000); setTimeout(() => Sfx.cymbal(), 2000);
+    setTimeout(() => Sfx.drumroll(2), 3200); show(2, 5200); setTimeout(() => Sfx.cymbal(), 5200);
+    setTimeout(() => Sfx.drumroll(3), 6400); show(1, 9400); setTimeout(() => { Sfx.fanfare(); VQ.confetti(9000, 260); }, 9400);
+    setTimeout(() => Sfx.loop('lobby'), 12000);
+    bottom.innerHTML = `<button class="btn ghost" id="bAgain">↻ Показати ще раз</button><button class="btn ghost" id="bNew">↺ Нова гра</button>`;
+    $('#bAgain').onclick = () => { Sfx.stopLoop(); render(); };
+    $('#bNew').onclick = () => { if (confirm('Почати нову гру?')) { Sfx.stopLoop(); net && net.pub(base() + '/s', null, { retain: true }); newGame(); startNet(); render(); } };
+  }
+}
+function plural(n) { return n % 10 === 1 && n % 100 !== 11 ? 'гравець' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20)) ? 'гравці' : 'гравців'; }
+function lobbyNames() {
+  const box = $('#names'); if (!box) return render();
+  const n = Object.keys(G.players).length;
+  $('#cnt').innerHTML = `<b>${n}</b>${plural(n)} у грі`;
+  const have = new Map([...box.children].map(c => [c.dataset.id, c]));
+  have.forEach((c, id) => { if (!G.players[id]) c.remove(); else if (c.textContent !== G.players[id].name) c.textContent = G.players[id].name; });
+  for (const id in G.players) if (!have.has(id)) {
+    const c = document.createElement('span'); c.className = 'chip pop'; c.dataset.id = id; c.title = 'Натисни, щоб прибрати'; c.textContent = G.players[id].name;
+    c.onclick = () => { if (confirm('Прибрати «' + c.textContent + '» з гри?')) { delete G.players[id]; save(); lobbyNames(); publish(); } };
+    box.appendChild(c);
+  }
+}
+function updateAnswered() { const e = $('#ansN'); if (e) { e.textContent = Object.keys(G.answers).length; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } Sfx.tick(false); }
+function countUp() {
+  const els = [...stage.querySelectorAll('.sc[data-v]')], t0 = performance.now();
+  (function f(now) { const k = Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - k, 3); els.forEach(x => x.textContent = Math.round(x.dataset.v * e)); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+
+/* ---------- Редактор питань ---------- */
+const edText = $('#edText');
+function edCheck() {
+  const { quiz, errs } = parseQuiz(edText.value), st = $('#edStatus');
+  st.className = 'status ' + (errs.length ? 'err' : 'ok');
+  st.innerHTML = errs.length ? errs.slice(0, 6).map(esc).join('<br>') : `✓ ${quiz.qs.length} питань, «${esc(quiz.title)}»`;
+  $('#edSave').disabled = !!errs.length;
+}
+function openEditor() { edText.value = quizText(); edCheck(); $('#editor').classList.add('on'); edText.focus(); }
+edText.oninput = edCheck;
+$('#edClose').onclick = () => $('#editor').classList.remove('on');
+$('#edDefault').onclick = () => { if (confirm('Замінити текст шаблоном?')) { edText.value = DEFAULT_QUESTIONS; edCheck(); } };
+$('#edSave').onclick = () => {
+  const { quiz, errs } = parseQuiz(edText.value); if (errs.length) return;
+  ls.set(LS_Q, edText.value); G.title = quiz.title; G.qs = quiz.qs; save();
+  $('#editor').classList.remove('on'); render(); publish(); toast('Збережено');
+};
+$('#edExport').onclick = () => {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([edText.value], { type: 'text/plain;charset=utf-8' }));
+  a.download = (parseQuiz(edText.value).quiz.title || 'квіз').replace(/[\\/:*?"<>|]/g, '') + '.txt'; a.click();
+};
+$('#edImport').onclick = () => $('#edFile').click();
+$('#edFile').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { edText.value = t; edCheck(); }); e.target.value = ''; };
+function toast(t) { const d = document.createElement('div'); d.className = 'toast pop'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
+
+/* ---------- Кнопки і клавіші ---------- */
+Sfx.setMuted(ls.get(LS_MUTE) === '1');
+const soundLabel = () => $('#bSound').textContent = Sfx.muted ? '🔇 Без звуку' : '🔊 Звук';
+soundLabel();
+$('#bSound').onclick = () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); ls.set(LS_MUTE, Sfx.muted ? '1' : '0'); soundLabel(); };
+$('#bFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+document.addEventListener('pointerdown', () => { Sfx.init(); if (G.phase === 'lobby' && !Sfx.loopKind) Sfx.loop('lobby'); }, { once: false });
+document.addEventListener('keydown', e => {
+  if ($('#editor').classList.contains('on') || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); if (G.phase !== 'final') next(); }
+  else if (e.key === 'm' || e.key === 'M' || e.key === 'ь' || e.key === 'Ь') $('#bSound').click();
+  else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') $('#bFull').click();
+});
+
+/* Якщо сторінку перезавантажили посеред гри: продовжуємо */
+startNet();
+render();
+if (G.phase === 'intro') { clearTimeout(tmr); tmr = setTimeout(() => { if (G.phase === 'intro') startQuestion(); }, Math.max(300, G.qStart - Date.now())); }
+if (G.phase === 'final') Sfx.stopLoop();
+</script>
+</body>
+</html>
