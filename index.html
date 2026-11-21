@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795265422">
+<link rel="stylesheet" href="style.css?v=1795275628">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -51,15 +51,15 @@
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V='1795265422'</script>
-<script src="lib/mqtt.min.js?v=1795265422"></script>
-<script src="common.js?v=1795265422"></script>
-<script src="lib/gsap.min.js?v=1795265422"></script>
-<script src="liquid.js?v=1795265422"></script>
-<script src="stagefx.js?v=1795265422"></script>
-<script src="doodle.js?v=1795265422"></script>
-<script src="nerdfx.js?v=1795265422"></script>
-<script src="fx.js?v=1795265422"></script>
+<script>window.VQ_V='1795275628'</script>
+<script src="lib/mqtt.min.js?v=1795275628"></script>
+<script src="common.js?v=1795275628"></script>
+<script src="lib/gsap.min.js?v=1795275628"></script>
+<script src="liquid.js?v=1795275628"></script>
+<script src="stagefx.js?v=1795275628"></script>
+<script src="doodle.js?v=1795275628"></script>
+<script src="nerdfx.js?v=1795275628"></script>
+<script src="fx.js?v=1795275628"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -73,7 +73,7 @@ const LETTERS = ['A', 'Б', 'В', 'Г'];
 const scr = document.getElementById('scr');
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 const room = (params.get('r') || '').toUpperCase().replace(/[^A-Z]/g, '');
-VQ.applyTheme(params.get('theme') || ls.get('vq_theme') || 'nerd');
+VQ.applyTheme(params.get('theme') || ls.get('vq_theme') || 'show');
 let myId = ls.get('vq_id'); if (!myId) { myId = VQ.rid(14); ls.set('vq_id', myId); }
 let myName = ls.get('vq_name') || '';
 const JK = 'vq_joined_' + room;

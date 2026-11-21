@@ -195,14 +195,14 @@ const VQ = (() => {
     pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
   };
   function applyTheme(t) {
-    if (!THEMES[t]) t = 'nerd';
+    if (!THEMES[t]) t = 'show';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
     document.getElementById('tc').href = 'theme-' + t + '.css?v=' + (window.VQ_V || '');
     const bg = document.querySelector('.bg');
     bg && bg.querySelectorAll('.bubbles').forEach(e => e.remove());
-    if (bg && t === 'glass') {
+    if (bg && (t === 'glass' || t === 'show')) {
       const b = document.createElement('div'); b.className = 'bubbles';
       for (let k = 0; k < 18; k++) {
         const sz = 14 + Math.random() * 90, sp = document.createElement('span');
@@ -213,7 +213,7 @@ const VQ = (() => {
     }
     if (window.LQ) {
       const phone = !document.getElementById('stage');
-      if (t === 'glass') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
+      if (t === 'glass' || t === 'show') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
     }
     if (window.NF) {
       const phone = !document.getElementById('stage');
@@ -225,7 +225,7 @@ const VQ = (() => {
     }
     if (window.ST) {
       const phone = !document.getElementById('stage');
-      if (t === 'show') ST.start({ scale: phone ? .5 : .6, small: phone }); else ST.stop();
+      if (false) ST.start({ scale: phone ? .5 : .6, small: phone }); else ST.stop();
     }
     return t;
   }

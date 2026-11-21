@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795265422">
+<link rel="stylesheet" href="style.css?v=1795275628">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -172,16 +172,16 @@
   </div>
 </div>
 
-<script>window.VQ_V='1795265422'</script>
-<script src="lib/mqtt.min.js?v=1795265422"></script>
-<script src="lib/qrcode.js?v=1795265422"></script>
-<script src="common.js?v=1795265422"></script>
-<script src="lib/gsap.min.js?v=1795265422"></script>
-<script src="liquid.js?v=1795265422"></script>
-<script src="stagefx.js?v=1795265422"></script>
-<script src="doodle.js?v=1795265422"></script>
-<script src="nerdfx.js?v=1795265422"></script>
-<script src="fx.js?v=1795265422"></script>
+<script>window.VQ_V='1795275628'</script>
+<script src="lib/mqtt.min.js?v=1795275628"></script>
+<script src="lib/qrcode.js?v=1795275628"></script>
+<script src="common.js?v=1795275628"></script>
+<script src="lib/gsap.min.js?v=1795275628"></script>
+<script src="liquid.js?v=1795275628"></script>
+<script src="stagefx.js?v=1795275628"></script>
+<script src="doodle.js?v=1795275628"></script>
+<script src="nerdfx.js?v=1795275628"></script>
+<script src="fx.js?v=1795275628"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -189,7 +189,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795265422"></script>
+<script src="questions.js?v=1795275628"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -235,7 +235,7 @@ let G = null;
 function newGame() {
   const p = parseQuiz(quizText());
   const code = Array.from(crypto.getRandomValues(new Uint8Array(5)), b => 'ABCDEFGHJKLMNPRSTUVWXYZ'[b % 23]).join('');
-  G = { room: code, broker: 0, theme: (G && G.theme) || 'nerd', title: p.quiz.title, greet: p.quiz.greet, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
+  G = { room: code, broker: 0, theme: (G && G.theme) || 'show', title: p.quiz.title, greet: p.quiz.greet, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
   save();
 }
 function save() { ls.set(LS_GAME, JSON.stringify(G)); }
@@ -526,7 +526,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* Якщо сторінку перезавантажили посеред гри: продовжуємо */
-if (!ls.get('vq_def_nerd')) { G.theme = 'nerd'; ls.set('vq_def_nerd', '1'); save(); }
+if (!ls.get('vq_def_glass2')) { G.theme = 'show'; ls.set('vq_def_glass2', '1'); save(); }
 if (VQ.params.get('theme')) { G.theme = VQ.params.get('theme'); save(); }
 G.theme = VQ.applyTheme(G.theme);
 startNet();

@@ -326,13 +326,3 @@ input::placeholder { color: rgba(255,255,255,.4); }
 .crown { font-size: 8vmin; }
 @media (prefers-reduced-motion: reduce) { .col::before, .col.show.p1 .block { animation: none; } }
 
-/* ===== Фон «ефірно, але весело»: студійна синява з теплим світлом сцени знизу ===== */
-body { background: #0a1033; }
-.bg { background:
-  radial-gradient(90% 55% at 50% 112%, rgba(255,110,120,.55), rgba(255,110,120,0) 70%),
-  radial-gradient(60% 45% at 12% 100%, rgba(255,184,0,.32), transparent 70%),
-  radial-gradient(60% 45% at 90% 96%, rgba(255,95,162,.38), transparent 70%),
-  radial-gradient(80% 60% at 70% 20%, rgba(110,70,230,.35), transparent 70%),
-  linear-gradient(180deg, #071233 0%, #121a58 45%, #2a1a5e 78%, #3a1650 100%); }
-.bg::before, .bubbles { display: none !important; }
-#stfx { mix-blend-mode: normal; }
