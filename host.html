@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795279843">
+<link rel="stylesheet" href="style.css?v=1795280314">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -213,10 +213,26 @@
   .ed .acts { grid-column: 1/-1; display: flex; gap: 10px; flex-wrap: wrap; }
   .ed .acts .btn { font-size: 15px; padding: .7em 1.3em; }
   .ed .acts .sp { flex: 1; }
-  .toast { position: fixed; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
+  /* Пошук гіфок і фото */
+  .picker { position: fixed; inset: 0; z-index: 52; display: none; background: rgba(30,20,70,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); padding: 3vmin; color: #1d1b3a; font-size: 15px; }
+  .picker.on { display: flex; }
+  .pk { margin: auto; width: min(1100px, 100%); height: 100%; display: flex; flex-direction: column; gap: 12px; background: #fff; border-radius: 24px; padding: 18px 20px; box-shadow: 0 30px 80px rgba(30,20,90,.3); }
+  .pk-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pk-tabs { display: inline-flex; background: #f1eefb; border-radius: 999px; padding: 4px; }
+  .pk-tabs button { border: 0; background: transparent; padding: 9px 16px; border-radius: 999px; font: 700 14px/1 inherit; color: #1d1b3a; cursor: pointer; }
+  .pk-tabs button.on { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.1); color: var(--gold); }
+  .picker input[type=search] { flex: 1; min-width: 200px; border: 1.5px solid #e6e2f4; border-radius: 999px; padding: 11px 18px; font: inherit; font-size: 16px; color: #1d1b3a; background: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; animation: none; }
+  .picker input[type=search]:focus { outline: none; border-color: var(--gold); }
+  .pk-res { flex: 1; min-height: 0; overflow: auto; columns: 4 200px; column-gap: 10px; }
+  .pk-res button { display: block; width: 100%; margin: 0 0 10px; padding: 0; border: 0; border-radius: 12px; overflow: hidden; cursor: pointer; background: #f3f1fb; break-inside: avoid; }
+  .pk-res button:hover { outline: 3px solid var(--gold); }
+  .pk-res img { display: block; width: 100%; height: auto; }
+  .pk-msg { column-span: all; text-align: center; color: rgba(29,27,58,.55); padding: 40px 10px; }
+  .pk-foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: rgba(29,27,58,.5); }
+  .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <link rel="stylesheet" id="tc">
-<link rel="stylesheet" href="pal-blue.css?v=1795279843">
+<link rel="stylesheet" href="pal-blue.css?v=1795280314">
 </head>
 <body>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
@@ -279,6 +295,18 @@
   <input type="file" id="fImport" accept=".json,.txt,application/json,text/plain" hidden>
 </div>
 
+<div class="picker" id="picker">
+  <div class="pk">
+    <div class="pk-head">
+      <div class="pk-tabs"><button data-src="gif" class="on">Гіфки</button><button data-src="photo">Фото</button></div>
+      <input type="search" id="pkQ" placeholder="Що шукаємо? Наприклад: весілля, торт, котик" autocomplete="off">
+      <button class="sbtn" id="pkClose">✕ Закрити</button>
+    </div>
+    <div class="pk-res" id="pkRes"></div>
+    <div class="pk-foot"><span id="pkSrc">Powered by GIPHY</span><span>Клікніть на картинку, щоб додати до питання</span></div>
+  </div>
+</div>
+
 <div class="modal" id="editor">
   <div class="ed">
     <h3>Вставити питання списком</h3>
@@ -300,18 +328,18 @@
   </div>
 </div>
 
-<script>window.VQ_V = '1795279843'</script>
-<script src="lib/mqtt.min.js?v=1795279843"></script>
-<script src="lib/qrcode.js?v=1795279843"></script>
-<script src="common.js?v=1795279843"></script>
-<script src="lib/gsap.min.js?v=1795279843"></script>
-<script src="liquid.js?v=1795279843"></script>
-<script src="substance.js?v=1795279843"></script>
-<script src="sway.js?v=1795279843"></script>
-<script src="stagefx.js?v=1795279843"></script>
-<script src="doodle.js?v=1795279843"></script>
-<script src="nerdfx.js?v=1795279843"></script>
-<script src="fx.js?v=1795279843"></script>
+<script>window.VQ_V = '1795280314'</script>
+<script src="lib/mqtt.min.js?v=1795280314"></script>
+<script src="lib/qrcode.js?v=1795280314"></script>
+<script src="common.js?v=1795280314"></script>
+<script src="lib/gsap.min.js?v=1795280314"></script>
+<script src="liquid.js?v=1795280314"></script>
+<script src="substance.js?v=1795280314"></script>
+<script src="sway.js?v=1795280314"></script>
+<script src="stagefx.js?v=1795280314"></script>
+<script src="doodle.js?v=1795280314"></script>
+<script src="nerdfx.js?v=1795280314"></script>
+<script src="fx.js?v=1795280314"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -319,7 +347,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795279843"></script>
+<script src="questions.js?v=1795280314"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -688,8 +716,8 @@ function qCard(q, i) {
     <div class="qc-bot">
       <div class="qtime"><span class="lbl">⏱ Час</span><div class="stepper ${q.t ? '' : 'def'}"><button data-act="t-">−</button><b>${q.t || Q.time} сек</b><button data-act="t+">+</button></div>${q.t ? '<button class="sbtn" data-act="tdef">як у всіх</button>' : ''}</div>
       <div class="qphoto">${img ? `<div class="mini" title="Так буде на екрані"><div class="mq"></div><div class="mm" style="--s:${q.isz || 80}%"><img src="${img}" alt=""></div><div class="mg"><i class="ans0"></i><i class="ans1"></i><i class="ans2"></i><i class="ans3"></i></div></div>
-        <div class="szr"><span class="lbl">Розмір фото: <b class="szv">${q.isz || 80}%</b></span><input type="range" min="30" max="100" step="5" value="${q.isz || 80}" data-act="isz"><div class="btns"><button class="sbtn" data-act="img">Замінити</button><button class="sbtn danger" data-act="imgdel">Прибрати</button></div></div>`
-        : '<button class="sbtn" data-act="img">📷 Додати фото</button><span class="su-hint" style="margin:0">або перетягніть / вставте (Ctrl+V)</span>'}</div>
+        <div class="szr"><span class="lbl">Розмір фото: <b class="szv">${q.isz || 80}%</b></span><input type="range" min="30" max="100" step="5" value="${q.isz || 80}" data-act="isz"><div class="btns"><button class="sbtn" data-act="find">🔍 Знайти</button><button class="sbtn" data-act="img">Свій файл</button><button class="sbtn danger" data-act="imgdel">Прибрати</button></div></div>`
+        : '<button class="sbtn" data-act="find">🔍 Знайти гіфку чи фото</button><button class="sbtn" data-act="img">📷 Свій файл</button><span class="su-hint" style="margin:0">або перетягніть / вставте (Ctrl+V)</span>'}</div>
     </div>
     <div class="qerr">${bad ? 'Не вистачає: ' + err.join(', ') : ''}</div>
   </div>`;
@@ -746,6 +774,7 @@ list.addEventListener('click', e => {
   else if (act === 't-' || act === 't+') q.t = Math.min(120, Math.max(5, (q.t || Q.time) + (act === 't+' ? 5 : -5)));
   else if (act === 'tdef') q.t = null;
   else if (act === 'img') { pickFor = i; $('#fQImg').click(); return; }
+  else if (act === 'find') { openPicker(i, q.q); return; }
   else if (act === 'imgdel') { const id = q.img; q.img = ''; gcImg(id); }
   else return;
   saveQuiz();
@@ -760,6 +789,65 @@ document.addEventListener('paste', e => {
   const f = [...(e.clipboardData && e.clipboardData.files || [])].find(f => /^image\//.test(f.type));
   if (c && f) { e.preventDefault(); setQImg(+c.dataset.i, f); }
 });
+
+/* Пошук гіфок (GIPHY) і фото (Openverse) для питання */
+const GIPHY_KEY = ls.get('vq_giphy') || 'lfOU0omGqL0xxv3jZ4ui7fpqJGnudSFq';
+let pkFor = -1, pkSrc = 'gif', pkT = null, pkSeq = 0;
+function openPicker(i, hint) {
+  pkFor = i; $('#picker').classList.add('on');
+  const inp = $('#pkQ'); if (!inp.value) inp.value = ''; inp.focus(); inp.select();
+  pkSearch();
+}
+function closePicker() { $('#picker').classList.remove('on'); pkFor = -1; }
+$('#pkClose').onclick = closePicker;
+$('#picker').addEventListener('click', e => { if (e.target.id === 'picker') closePicker(); });
+document.querySelectorAll('.pk-tabs button').forEach(b => b.onclick = () => {
+  pkSrc = b.dataset.src; document.querySelectorAll('.pk-tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $('#pkSrc').textContent = pkSrc === 'gif' ? 'Powered by GIPHY' : 'Фото: Openverse (вільні ліцензії)'; pkSearch();
+});
+$('#pkQ').oninput = () => { clearTimeout(pkT); pkT = setTimeout(pkSearch, 450); };
+$('#pkQ').onkeydown = e => { if (e.key === 'Enter') { clearTimeout(pkT); pkSearch(); } if (e.key === 'Escape') closePicker(); };
+async function pkSearch() {
+  const q = $('#pkQ').value.trim(), box = $('#pkRes'), seq = ++pkSeq;
+  if (pkSrc === 'photo' && !q) { box.innerHTML = '<div class="pk-msg">Введіть слово для пошуку. Англійською знаходить більше: cake, wedding, cat.</div>'; return; }
+  box.innerHTML = '<div class="pk-msg">Шукаю…</div>';
+  let items = [];
+  try {
+    if (pkSrc === 'gif') {
+      const u = q ? `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(q)}&limit=36&rating=pg-13&lang=uk`
+                  : `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_KEY}&limit=36&rating=pg-13`;
+      const r = await fetch(u); if (!r.ok) throw new Error(r.status === 429 ? 'ліміт' : 'GIPHY ' + r.status);
+      const d = await r.json();
+      items = d.data.map(g => ({ th: g.images.fixed_width.url, big: (g.images.downsized_medium || g.images.original).url, w: +g.images.fixed_width.width, h: +g.images.fixed_width.height }));
+    } else {
+      const r = await fetch(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&page_size=30&mature=false`);
+      if (!r.ok) throw new Error('Openverse ' + r.status);
+      const d = await r.json();
+      items = d.results.map(p => ({ th: p.thumbnail || p.url, big: p.url, w: p.width || 4, h: p.height || 3 }));
+    }
+  } catch (e) {
+    if (seq !== pkSeq) return;
+    box.innerHTML = `<div class="pk-msg">${e.message === 'ліміт' ? 'Забагато пошуків за годину (ліміт GIPHY 100). Спробуйте трохи пізніше.' : 'Не вдалося знайти. Перевірте інтернет.'}</div>`; return;
+  }
+  if (seq !== pkSeq) return;
+  if (!items.length) { box.innerHTML = '<div class="pk-msg">Нічого не знайшлося. Спробуйте інше слово.</div>'; return; }
+  box.innerHTML = items.map((it, k) => `<button data-k="${k}"><img loading="lazy" src="${esc(it.th)}" width="${it.w}" height="${it.h}" alt=""></button>`).join('');
+  box.querySelectorAll('button').forEach(b => b.onclick = () => pkPick(items[+b.dataset.k]));
+}
+async function pkPick(it) {
+  const i = pkFor; if (i < 0 || !Q.qs[i]) return;
+  closePicker(); toast('Додаю…');
+  /* Зберігаємо саму картинку, щоб на святі працювало й без пошуку; якщо сайт не віддає — лишаємо посилання */
+  let url = it.big;
+  try {
+    const r = await fetch(it.big); if (!r.ok) throw 0;
+    const b = await r.blob(); if (b.size > 8e6) throw 0;
+    url = await new Promise((res, rej) => { const f = new FileReader(); f.onload = () => res(f.result); f.onerror = rej; f.readAsDataURL(b); });
+  } catch (e) {}
+  const id = 'i' + VQ.rid(10); IMGS.set(id, url);
+  try { await IDB.put(id, url); } catch (e) { toast('Не збереглося в браузері'); }
+  const old = Q.qs[i].img; Q.qs[i].img = id; gcImg(old); saveQuiz(); refreshCard(i); toast('Додано');
+}
 
 /* Бокова панель */
 $('#sTitle').oninput = e => { Q.title = e.target.value.trim() || 'Квіз'; saveQuizSoon(); };
