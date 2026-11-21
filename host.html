@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795275628">
+<link rel="stylesheet" href="style.css?v=1795275988">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -172,16 +172,16 @@
   </div>
 </div>
 
-<script>window.VQ_V='1795275628'</script>
-<script src="lib/mqtt.min.js?v=1795275628"></script>
-<script src="lib/qrcode.js?v=1795275628"></script>
-<script src="common.js?v=1795275628"></script>
-<script src="lib/gsap.min.js?v=1795275628"></script>
-<script src="liquid.js?v=1795275628"></script>
-<script src="stagefx.js?v=1795275628"></script>
-<script src="doodle.js?v=1795275628"></script>
-<script src="nerdfx.js?v=1795275628"></script>
-<script src="fx.js?v=1795275628"></script>
+<script>window.VQ_V='1795275988'</script>
+<script src="lib/mqtt.min.js?v=1795275988"></script>
+<script src="lib/qrcode.js?v=1795275988"></script>
+<script src="common.js?v=1795275988"></script>
+<script src="lib/gsap.min.js?v=1795275988"></script>
+<script src="liquid.js?v=1795275988"></script>
+<script src="stagefx.js?v=1795275988"></script>
+<script src="doodle.js?v=1795275988"></script>
+<script src="nerdfx.js?v=1795275988"></script>
+<script src="fx.js?v=1795275988"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -189,7 +189,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795275628"></script>
+<script src="questions.js?v=1795275988"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -452,7 +452,7 @@ function drawInner() {
 function plural(n) { return n % 10 === 1 && n % 100 !== 11 ? 'гравець' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20)) ? 'гравці' : 'гравців'; }
 /* Герой свята на першому екрані: фото без фону + привітання з голови */
 const LS_HERO = 'vq_hero';
-function heroSrc() { const h = ls.get(LS_HERO); return h === 'none' ? '' : (h || 'hero.webp'); }
+function heroSrc() { const h = ls.get(LS_HERO); return h === 'none' ? '' : (h || 'hero.webp?v=' + (window.VQ_V || '')); }
 function heroHtml() {
   const src = heroSrc(); if (!src) return '';
   const greet = G.greet || 'Привіт! Сьогодні моє свято 🎉 Перевіримо, хто знає мене найкраще?';
