@@ -198,6 +198,7 @@ const VQ = (() => {
     if (!THEMES[t]) t = 'show';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
+    const qbg = new URLSearchParams(location.search).get('bg'); if (qbg) document.body.dataset.bg = qbg;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
     document.getElementById('tc').href = 'theme-' + t + '.css?v=' + (window.VQ_V || '');
     const bg = document.querySelector('.bg');
