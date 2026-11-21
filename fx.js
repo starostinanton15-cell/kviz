@@ -1,9 +1,9 @@
 /* Режисура анімацій на GSAP для стилів «Скло-шоу» і «Рідке скло». Без GSAP або в інших стилях нічого не робить. */
 window.FX = (() => {
-  const THEMES = ['show', 'glass'];
+  const THEMES = ['show', 'glass', 'doodle'];
   const active = () => !!window.gsap && THEMES.includes(document.body.dataset.theme);
   const SK = () => document.body.dataset.theme === 'show' ? -9 : 0;
-  const boom = () => { if (window.LQ && LQ.on) LQ.pulse(); if (window.ST && ST.on) ST.pulse(); };
+  const boom = () => { if (window.LQ && LQ.on) LQ.pulse(); if (window.ST && ST.on) ST.pulse(); if (window.DD && DD.on) DD.pulse(); };
   const R = (a, b) => a + Math.random() * (b - a);
   let tiltEls = [], tl = null;
 

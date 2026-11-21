@@ -183,6 +183,7 @@ const VQ = (() => {
 
   /* ---------- Стилі ---------- */
   const THEMES = {
+    doodle: { name: 'Ігровий дудл', fonts: 'Rubik:wght@500;700;800;900&family=Caveat:wght@600;700' },
     show: { name: 'Скло-шоу', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@500;600;700;800' },
     glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
     edit: { name: 'Журнал', fonts: 'Inter+Tight:ital,wght@0,500;0,700;0,800;0,900;1,900&family=Cormorant+Garamond:ital,wght@1,500;1,600' },
@@ -211,6 +212,10 @@ const VQ = (() => {
     if (window.LQ) {
       const phone = !document.getElementById('stage');
       if (t === 'glass') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
+    }
+    if (window.DD) {
+      const phone = !document.getElementById('stage');
+      if (t === 'doodle') DD.start({ scale: phone ? .7 : .6, small: phone }); else DD.stop();
     }
     if (window.ST) {
       const phone = !document.getElementById('stage');

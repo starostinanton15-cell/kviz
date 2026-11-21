@@ -1,0 +1,167 @@
+/* Стиль «Ігровий дудл»: за рефами Paris Games Week (іграшкові ізометричні блоки з товстим контуром і боковою гранню),
+   Nerdactic (насичений фіолетовий ігровий інтерфейс) і Party People (білі каракулі від руки поверх кадру).
+   Фонові каракулі «кипляться» в doodle.js. */
+:root {
+  --fd: 'Rubik'; --fb: 'Rubik'; --fh: 'Caveat';
+  --night: #170a33; --night2: #2a1260; --o: #170a33; --cream: #fbf1e1;
+  --blue: #5b7cfa; --blue-d: #3a4fc0; --red: #f0523d; --red-d: #ad2f1f; --sun: #f6c432; --sun-d: #bf8c10;
+  --violet: #9a6cf0; --violet-d: #6a3fc4; --pink: #ff7ac0; --mint: #4fd1a5;
+  --ink: #fbf1e1; --muted: rgba(251,241,225,.68); --gold: var(--sun); --ok: var(--mint); --bad: var(--red);
+  --a0: var(--red); --a1: var(--blue); --a2: var(--sun); --a3: var(--violet);
+  --card: var(--cream); --line: rgba(251,241,225,.2);
+  --wipe1: var(--sun); --wipe2: var(--red); --wipe3: var(--blue);
+  --dep: 1vmin;
+}
+body { background: var(--night); color: var(--ink); }
+/* Ніч ігрового міста: ледь помітна ізометрична сітка і фіолетове світло */
+.bg { background: radial-gradient(70% 60% at 50% 45%, rgba(110,60,220,.45), transparent 70%), radial-gradient(50% 40% at 100% 100%, rgba(240,82,61,.22), transparent 70%), radial-gradient(50% 40% at 0% 0%, rgba(91,124,250,.25), transparent 70%), var(--night); }
+.bg i, .bg::after, .bgmarq, .bubbles { display: none !important; }
+.bg::before { content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(30deg, rgba(251,241,225,.05) 0 1px, transparent 1px 46px), repeating-linear-gradient(150deg, rgba(251,241,225,.05) 0 1px, transparent 1px 46px);
+  -webkit-mask: radial-gradient(80% 70% at 50% 50%, #000, transparent); mask: radial-gradient(80% 70% at 50% 50%, #000, transparent); }
+
+/* Іграшковий блок: товстий контур і темніша бокова грань знизу */
+.qhead, .opt, .row, .timer, .answered, .qrcard, .btn, .chip, .result, .place, input, .col .block, .intro .num, .ticker.lob, .top .tools button, .bubble {
+  border: 3px solid var(--o) !important; }
+h1, h2, .qt, .finaltitle { font-family: var(--fd); font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: .95; color: var(--cream); }
+.lobby h1, .finaltitle, .board h2, .intro .qt { text-shadow: .05em .05em 0 var(--red), .1em .1em 0 var(--o); }
+.kin .c { animation: kdd .5s steps(4, end) both; animation-delay: calc(var(--i) * 25ms); }
+@keyframes kdd { from { opacity: 0; transform: translateY(.4em) rotate(-8deg); } }
+
+.btn { background: var(--sun); color: var(--o); border-radius: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: .01em;
+  box-shadow: 0 .7vmin 0 0 var(--sun-d), 0 .7vmin 0 3px var(--o); }
+.btn:active { transform: translateY(.5vmin); box-shadow: 0 .2vmin 0 0 var(--sun-d), 0 .2vmin 0 3px var(--o); }
+.btn.ghost { background: var(--cream); color: var(--o); box-shadow: 0 .7vmin 0 0 #c9b99c, 0 .7vmin 0 3px var(--o); font-weight: 800; }
+.top { color: var(--muted); font-weight: 600; }
+.top .tools button { background: var(--cream); color: var(--o); border-radius: 12px; box-shadow: 0 4px 0 0 #c9b99c, 0 4px 0 3px var(--o); }
+.dot.online { background: var(--mint); box-shadow: none; }
+
+/* Лобі */
+.ticker.lob { background: var(--red); color: var(--cream); border-radius: 14px; margin: 0 0 3.4vmin; padding: 1vmin 0; font-weight: 900; font-size: 2.3vmin; letter-spacing: .02em;
+  box-shadow: 0 .7vmin 0 0 var(--red-d), 0 .7vmin 0 3px var(--o); transform: rotate(-1deg); }
+.ticker.lob .track span:nth-child(even) { color: var(--sun); }
+.qrcard { position: relative; background: var(--cream); color: var(--o); border-radius: 22px; transform: rotate(-2deg);
+  box-shadow: 0 1.4vmin 0 0 #c9b99c, 0 1.4vmin 0 3px var(--o), 2.4vmin 3vmin 0 0 var(--violet); }
+.qrcard svg { border-radius: 10px; }
+.qrcard .code { color: var(--o); font-weight: 900; letter-spacing: .1em; }
+.qrcard .url { color: rgba(23,10,51,.55); }
+/* стрілка від руки до QR */
+.qrcard::after { content: ''; position: absolute; right: -11vmin; top: 4vmin; width: 12vmin; height: 9vmin;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 90'%3E%3Cpath d='M112 12 C80 6 40 20 22 58 M8 44 L20 64 L40 52' fill='none' stroke='%23fbf1e1' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+.lobby h1 { font-size: 8.5vmin; }
+.lobby .hint { font-family: var(--fh); font-size: 4.2vmin; font-weight: 700; color: var(--sun); transform: rotate(-2deg); transform-origin: left; line-height: 1; }
+.count { color: var(--cream); font-weight: 700; }
+.count b { color: var(--pink); font-size: 7vmin; font-weight: 900; }
+.chip { background: var(--cream); color: var(--o); border-radius: 12px; font-weight: 800; box-shadow: 0 4px 0 0 #c9b99c, 0 4px 0 3px var(--o); }
+.chip:nth-child(5n+1) { background: var(--sun); } .chip:nth-child(5n+2) { background: var(--pink); } .chip:nth-child(5n+3) { background: #b9c8ff; } .chip:nth-child(5n+4) { background: var(--mint); }
+.chip:nth-child(odd) { rotate: -2deg; } .chip:nth-child(even) { rotate: 1.5deg; }
+.bubble { background: var(--cream); color: var(--o); box-shadow: 0 1vmin 0 0 #c9b99c, 0 1vmin 0 3px var(--o); -webkit-backdrop-filter: none; backdrop-filter: none; font-family: var(--fh); font-size: 3.6vmin; line-height: 1.05; }
+.hero img { filter: drop-shadow(.8vmin 0 0 var(--cream)) drop-shadow(-.8vmin 0 0 var(--cream)) drop-shadow(0 -.8vmin 0 var(--cream)) drop-shadow(0 30px 40px rgba(0,0,0,.4)); }
+
+/* Інтро */
+.intro .num { display: inline-block; background: var(--pink); color: var(--o); border-radius: 14px; padding: .6vmin 3vmin; font-weight: 900; text-transform: uppercase; letter-spacing: .02em;
+  box-shadow: 0 .7vmin 0 0 #c4528f, 0 .7vmin 0 3px var(--o); transform: rotate(-3deg); }
+.intro .qt { font-size: 8vmin; max-width: 82vw; text-wrap: balance; }
+.introbar { background: var(--night2); border: 3px solid var(--o); height: 2vmin; }
+.introbar i { background: var(--sun); }
+
+/* Питання */
+.bignum { display: none; }
+.qhead { position: relative; background: var(--cream); color: var(--o); border-radius: 22px; font-size: 5.4vmin; font-weight: 900; letter-spacing: -.025em; line-height: 1.05;
+  padding: 3vmin 4.4vmin; min-height: 17vmin; display: grid; place-items: center; text-wrap: balance;
+  box-shadow: 0 1.2vmin 0 0 #c9b99c, 0 1.2vmin 0 3px var(--o); }
+.qhead::after { content: ''; position: absolute; left: -2.4vmin; top: -3.4vmin; width: 8vmin; height: 8vmin;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M40 6 L48 30 L74 30 L53 45 L61 70 L40 55 L19 70 L27 45 L6 30 L32 30 Z' fill='%23f6c432' stroke='%23170a33' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; rotate: -14deg; }
+.tline { height: 2vmin; border-radius: 99px; background: var(--night2); border: 3px solid var(--o); margin-top: 2.6vmin; }
+.tline i { background: repeating-linear-gradient(-45deg, var(--sun) 0 1.2vmin, #ffd968 1.2vmin 2.4vmin); border-radius: 99px; }
+.qmid { grid-template-columns: 1fr auto 1fr; gap: 3vmin; }
+.qinfo { display: flex; flex-direction: column; align-items: flex-start; justify-self: start; grid-column: 1; grid-row: 1; }
+.qinfo b { font-size: 13vmin; font-weight: 900; line-height: .85; color: var(--cream); text-shadow: .06em .06em 0 var(--blue), .1em .1em 0 var(--o); }
+.qinfo span { font-family: var(--fh); font-size: 4vmin; font-weight: 700; color: var(--sun); margin: .8vmin 0 1.4vmin .4vmin; transform: rotate(-3deg); }
+.qinfo .pips { display: flex; gap: .8vmin; flex-wrap: wrap; max-width: 34vmin; }
+.qinfo .pips i { width: 2.4vmin; height: 2.4vmin; border-radius: 6px; background: var(--night2); border: 2px solid var(--cream); }
+.qinfo .pips i.done { background: var(--blue); }
+.qinfo .pips i.cur { background: var(--sun); rotate: 12deg; scale: 1.25; }
+.qmid .timer { grid-column: 2; justify-self: center; width: 28vmin; height: 28vmin; border-radius: 50%; background: var(--cream);
+  box-shadow: 0 1.4vmin 0 0 #c9b99c, 0 1.4vmin 0 3px var(--o); }
+.timer .ttrack { stroke: #eadfcb; }
+.timer .tprog { stroke: var(--red); stroke-width: 12; stroke-linecap: round; }
+.timer .tn { font-size: 11vmin; font-weight: 900; color: var(--o); }
+.timer.low .tn { color: var(--red); }
+.answered { background: var(--blue); color: var(--cream); border-radius: 22px; padding: 2.2vmin 3.4vmin; transform: rotate(2deg);
+  box-shadow: 0 1vmin 0 0 var(--blue-d), 0 1vmin 0 3px var(--o); }
+.answered b { color: var(--cream); font-size: 10vmin; font-weight: 900; }
+.answered span { color: var(--cream); font-family: var(--fh); font-size: 3.4vmin; font-weight: 700; }
+.ans0 { --c: var(--red); --d: var(--red-d); --t: var(--cream); } .ans1 { --c: var(--blue); --d: var(--blue-d); --t: var(--cream); }
+.ans2 { --c: var(--sun); --d: var(--sun-d); --t: var(--o); } .ans3 { --c: var(--violet); --d: var(--violet-d); --t: var(--cream); }
+.opt { background: var(--c) !important; color: var(--t); border-radius: 20px; font-size: 3.8vmin; font-weight: 800; letter-spacing: -.015em; min-height: 11vmin;
+  box-shadow: 0 var(--dep) 0 0 var(--d), 0 var(--dep) 0 3px var(--o); }
+.opt .letter { background: var(--cream); color: var(--o); border: 3px solid var(--o); border-radius: 12px; font-weight: 900; rotate: -6deg; }
+.opt.win { transform: translateY(-1vmin) rotate(-1deg) scale(1.04); box-shadow: 0 1.6vmin 0 0 var(--d), 0 1.6vmin 0 3px var(--o), 0 0 0 1vmin var(--cream); }
+.opt.dim { opacity: .3; filter: saturate(.3); }
+.opt .mark { font-family: var(--fh); font-size: 7vmin; line-height: .5; color: var(--cream); }
+.bars { gap: 2.4vmin; }
+.bar i { background: var(--c); border: 3px solid var(--o); border-bottom: 0; border-radius: 12px 12px 0 0; box-shadow: inset -1.2vmin 0 0 var(--d); }
+.bar b { color: var(--cream); font-weight: 900; }
+
+/* Таблиця лідерів */
+.board h2 { font-size: 7.5vmin; }
+.rows { gap: 1.6vmin; }
+.row { background: var(--cream); color: var(--o); border-radius: 18px; padding: 1.3vmin 2.6vmin; font-weight: 800; box-shadow: 0 .8vmin 0 0 #c9b99c, 0 .8vmin 0 3px var(--o); }
+.row .pl, .row:nth-child(n) .pl { background: var(--night2); color: var(--cream); border: 3px solid var(--o); border-radius: 12px; width: 2em; height: 2em; font-weight: 900; rotate: -5deg; }
+.row .sc { color: var(--o); font-weight: 900; font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: right; }
+.row:nth-child(1) { background: var(--sun); font-size: 4.4vmin; padding: 1.9vmin 3vmin; box-shadow: 0 1.1vmin 0 0 var(--sun-d), 0 1.1vmin 0 3px var(--o); rotate: -.6deg; margin-bottom: .6vmin; }
+.row:nth-child(1) .pl { background: var(--red); }
+.row:nth-child(2) .pl { background: var(--blue); }
+.row:nth-child(3) .pl { background: var(--violet); }
+.row:nth-child(n+4) { font-size: 3vmin; padding-top: 1vmin; padding-bottom: 1vmin; }
+.row .up { background: var(--mint); color: var(--o); border: 2px solid var(--o); padding: .1em .5em; border-radius: 8px; font-size: .55em; font-weight: 900; rotate: 4deg; }
+.row .gain { display: inline-block; font-family: var(--fh); color: var(--red); font-size: .85em; font-weight: 700; rotate: -4deg; }
+.row:nth-child(1) .gain { color: var(--o); }
+
+/* П'єдестал: іграшкові будиночки з вікнами */
+.finaltitle { font-size: 9vmin; }
+.podium { gap: 2.4vmin; }
+.col .who .nm { display: inline-block; background: var(--cream); color: var(--o); border: 3px solid var(--o); border-radius: 14px; padding: .1em .55em; font-size: 3.8vmin; font-weight: 900; text-transform: uppercase; box-shadow: 0 .6vmin 0 3px var(--o); rotate: -3deg; }
+.col.p1 .who .nm { background: var(--sun); font-size: 5vmin; }
+.col .who .sc { display: block; margin-top: 1.2vmin; font-family: var(--fh); color: var(--sun); font-weight: 700; font-size: 4vmin; }
+.col .block { position: relative; border-bottom: 0 !important; border-radius: 16px 16px 0 0; font-size: 12vmin; font-weight: 900; color: var(--cream); text-shadow: .06em .06em 0 var(--o);
+  background-image: linear-gradient(90deg, transparent 0 74%, rgba(23,10,51,.28) 74%) !important;
+  border-top-width: 1.6vmin !important; }
+.col .block::after { content: ''; position: absolute; left: 14%; right: 34%; top: 16vmin; bottom: 2vmin; pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(251,241,225,.4) 0 3vmin, transparent 3vmin 5vmin);
+  -webkit-mask: repeating-linear-gradient(180deg, #000 0 3vmin, transparent 3vmin 5.2vmin); mask: repeating-linear-gradient(180deg, #000 0 3vmin, transparent 3vmin 5.2vmin); }
+.col.p1 .block { background-color: var(--sun); color: var(--cream); border-top-color: #ffe08a !important; }
+.col.p2 .block { background-color: var(--blue); border-top-color: #9db0ff !important; }
+.col.p3 .block { background-color: var(--red); border-top-color: #ff9a8a !important; }
+.col.show.p1 .block { animation: hop 1.4s steps(3, end) 1s infinite; }
+@keyframes hop { 0%, 60%, 100% { translate: 0 0; } 75% { translate: 0 -1.2vmin; } }
+.crown { font-size: 8vmin; rotate: -10deg; }
+#wipe i { border-top: 4px solid var(--o); border-bottom: 4px solid var(--o); }
+.modal { background: rgba(23,10,51,.8); }
+.toast { background: var(--sun); color: var(--o); border: 3px solid var(--o); }
+
+/* Телефон гостя */
+#scr h1 { font-size: 34px; }
+.sub { color: var(--muted) !important; }
+.top .me { color: var(--cream) !important; }
+input { background: var(--cream); color: var(--o); border-radius: 16px; box-shadow: 0 5px 0 3px var(--o); font-weight: 800; text-transform: uppercase; }
+input::placeholder { color: rgba(23,10,51,.35); }
+.tbar { background: var(--night2); border: 3px solid var(--o); height: 16px; border-radius: 99px; overflow: hidden; }
+.tbar i { background: var(--sun); }
+.qtext { color: var(--cream); font-weight: 800; }
+#scr .opt { font-size: 17px; border-radius: 18px; min-height: 0; --dep: 6px; }
+#scr .opt:active { transform: translateY(5px); box-shadow: 0 1px 0 0 var(--d), 0 1px 0 3px var(--o); }
+.result { background: var(--cream); color: var(--o); border-radius: 24px; box-shadow: 0 8px 0 0 #c9b99c, 0 8px 0 3px var(--o); }
+.result.ok { background: var(--mint); box-shadow: 0 8px 0 0 #2a9c76, 0 8px 0 3px var(--o); }
+.result.ok .sub, .result.ok h2 { color: var(--o) !important; }
+.result.bad { background: var(--red); color: var(--cream); box-shadow: 0 8px 0 0 var(--red-d), 0 8px 0 3px var(--o); }
+.result.bad .sub { color: var(--cream) !important; }
+.result .gain { background: var(--o); color: var(--sun); border-radius: 12px; }
+.place { background: var(--cream); color: var(--o); border-radius: 14px; padding: 10px 22px; box-shadow: 0 4px 0 3px var(--o); align-self: center; }
+.place b { color: var(--red); }
+.dots i { background: var(--sun); }
+.top .pts { color: var(--sun); font-weight: 900; }
+@media (prefers-reduced-motion: reduce) { .col.show.p1 .block { animation: none; } }
+.stage.has-hero .bubble { width: min(25vw, 430px); right: 58%; top: -9vh; font-size: 3.2vmin; }
+.stage.has-hero .lobby { padding-right: 32vw; }
