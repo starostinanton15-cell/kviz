@@ -195,7 +195,7 @@ const VQ = (() => {
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
-    document.getElementById('tc').href = 'theme-' + t + '.css';
+    document.getElementById('tc').href = 'theme-' + t + '.css?v=' + (window.VQ_V || '');
     const bg = document.querySelector('.bg');
     bg && bg.querySelectorAll('.bubbles').forEach(e => e.remove());
     if (bg && t === 'glass') {
