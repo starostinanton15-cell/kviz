@@ -29,7 +29,7 @@ window.SW = (() => {
       });
     }
     // героїня гойдається від стоп, як людина в рефі
-    document.querySelectorAll('.hero img.main').forEach(el => { el.style.rotate = `${(Math.sin(t * w + 2.2) * 1.3).toFixed(3)}deg`; el.style.transformOrigin = '50% 100%'; });
+    document.querySelectorAll('.hero img.main').forEach(el => { el.style.rotate = `${(Math.sin(t * w + 2.2) * .7).toFixed(3)}deg`; el.style.transformOrigin = '50% 100%'; });
   }
   function clear() { [...LAYERS, ['.hero img.main']].forEach(([s]) => document.querySelectorAll(s).forEach(el => { el.style.translate = el.style.rotate = el.style.scale = ''; })); }
   return {
