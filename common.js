@@ -183,6 +183,7 @@ const VQ = (() => {
 
   /* ---------- Стилі ---------- */
   const THEMES = {
+    show: { name: 'Скло-шоу', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@500;600;700;800' },
     glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
     edit: { name: 'Журнал', fonts: 'Inter+Tight:ital,wght@0,500;0,700;0,800;0,900;1,900&family=Cormorant+Garamond:ital,wght@1,500;1,600' },
     live: { name: 'Трансляція', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900' },
@@ -191,14 +192,14 @@ const VQ = (() => {
     pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
   };
   function applyTheme(t) {
-    if (!THEMES[t]) t = 'neon';
+    if (!THEMES[t]) t = 'show';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
     document.getElementById('tc').href = 'theme-' + t + '.css?v=' + (window.VQ_V || '');
     const bg = document.querySelector('.bg');
     bg && bg.querySelectorAll('.bubbles').forEach(e => e.remove());
-    if (bg && t === 'glass') {
+    if (bg && (t === 'glass' || t === 'show')) {
       const b = document.createElement('div'); b.className = 'bubbles';
       for (let k = 0; k < 18; k++) {
         const sz = 14 + Math.random() * 90, sp = document.createElement('span');

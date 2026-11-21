@@ -65,3 +65,11 @@ h1, h2, .display { font-family: var(--fd, inherit); }
 .bgmarq { display: none; }
 .bgmarq > div { white-space: nowrap; }
 .bgmarq span { display: inline-block; animation: tick 70s linear infinite; }
+
+/* Наведення курсору: кнопка пружно збільшується */
+@media (hover: hover) {
+  .btn, .top .tools button, .chip, .opt { transition: scale .45s cubic-bezier(.34, 1.7, .5, 1), filter .3s, box-shadow .3s; }
+  .btn:hover, .top .tools button:hover { scale: 1.08; filter: brightness(1.06); }
+  .btn:active { scale: .97; }
+  .chip:hover { scale: 1.1; }
+}
