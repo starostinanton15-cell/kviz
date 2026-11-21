@@ -3,18 +3,19 @@
    pearl — рідкий перламутр (глянцева поверхня, що повільно перетікає); ink — пастельна фарба, що розпливається у воді.
    Курсор закручує субстанцію; SB.pulse() — сплеск на святкові моменти. */
 window.SB = (() => {
-  let gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
+  let pa = 0, gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
   const mouse = { x: .5, y: .5, tx: .5, ty: .5, on: 0, ton: 0 };
   const MODES = { silk: 0, pearl: 1, ink: 2 };
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
   const FS = `precision highp float;
-uniform vec2 R; uniform float T; uniform float M; uniform vec3 MS; uniform float BO;
+uniform vec2 R; uniform float T; uniform float M; uniform vec3 MS; uniform float BO; uniform float PA;
 float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
 float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
   return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
 float fbm(vec2 p){ float s = 0., a = .5; mat2 r = mat2(.8,.6,-.6,.8); for (int i = 0; i < 5; i++){ s += a*n2(p); p = r*p*2.02 + 3.1; a *= .5; } return s; }
 vec3 pal(float t){ /* пастельний перламутр: рожевий → персик → бузок → блакить → м'ята */
-  return .78 + .22*cos(6.2831*(t + vec3(.0, .18, .38))); }
+  vec3 p = .78 + .22*cos(6.2831*(t + vec3(.0, .18, .38)));
+  return mix(p, .74 + .24*cos(6.2831*(t*.6 + vec3(.55, .45, .30))), PA); }
 vec2 swirl(vec2 uv){ /* курсор закручує */
   vec2 d = uv - MS.xy; float r = length(d); float a = MS.z * 2.2 * exp(-r*r*7.);
   float c = cos(a), s = sin(a); return MS.xy + mat2(c,-s,s,c)*d; }
@@ -58,8 +59,9 @@ void main(){
     vec2 a = vec2(fbm(q + vec2(0., t)), fbm(q + vec2(5.2, 1.3) - t*.8));
     vec2 b = vec2(fbm(q + 3.*a + vec2(1.7, 9.2) + t*.6), fbm(q + 3.*a + vec2(8.3, 2.8) - t*.5));
     float f = fbm(q + 3.2*b);
-    vec3 c1 = vec3(1., .72, .84), c2 = vec3(.74, .80, 1.), c3 = vec3(1., .86, .70), c4 = vec3(.78, .96, .90);
-    col = mix(vec3(.99,.97,1.), c1, smoothstep(.25, .75, f));
+    vec3 c1 = mix(vec3(1., .72, .84), vec3(.62, .78, 1.), PA), c2 = mix(vec3(.74, .80, 1.), vec3(.70, .70, 1.), PA),
+         c3 = mix(vec3(1., .86, .70), vec3(.66, .93, 1.), PA), c4 = mix(vec3(.78, .96, .90), vec3(.80, .96, .94), PA);
+    col = mix(mix(vec3(.99,.97,1.), vec3(.96,.98,1.), PA), c1, smoothstep(.25, .75, f));
     col = mix(col, c2, smoothstep(.35, .9, length(a)*.9));
     col = mix(col, c3, smoothstep(.55, 1., b.x) * .8);
     col = mix(col, c4, smoothstep(.6, 1., b.y) * .6);
@@ -81,7 +83,7 @@ void main(){
     gl.useProgram(prog);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ['R', 'T', 'M', 'MS', 'BO'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
+    ['R', 'T', 'M', 'MS', 'BO', 'PA'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
     addEventListener('pointermove', e => { mouse.tx = e.clientX / innerWidth; mouse.ty = 1 - e.clientY / innerHeight; mouse.ton = 1; }, { passive: true });
     addEventListener('pointerleave', () => { mouse.ton = 0; });
     addEventListener('resize', resize);
@@ -101,6 +103,7 @@ void main(){
     const m = MODES[document.body.dataset.sub] ?? MODES[mode] ?? 0;
     gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform1f(uni.M, m);
     gl.uniform3f(uni.MS, .5, .5, boost * .6); /* без реакції на мишку — Антон попросив */ gl.uniform1f(uni.BO, boost);
+    pa += ((document.body.dataset.pal === 'blue' ? 1 : 0) - pa) * Math.min(1, dt * 2); gl.uniform1f(uni.PA, pa);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function frame(now) {

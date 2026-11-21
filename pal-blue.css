@@ -1,0 +1,20 @@
+/* Синя палітра «Рідкого скла» (для хлопця/чоловіка): body[data-pal="blue"] */
+body[data-pal="blue"] {
+  --ink: #13234d; --muted: rgba(19,35,77,.58); --gold: #2f6bff;
+  --a0: #3b7bff; --a1: #7b5cff; --a2: #ff9a3c; --a3: #17c3b2;
+  --wipe1: rgba(205,225,255,.6); --wipe2: rgba(200,240,255,.6); --wipe3: rgba(215,215,255,.6);
+  --iri: linear-gradient(100deg, #2f6bff, #4fb3ff 40%, #22d3c5 75%, #6a7bff);
+  --gl-sh: inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.4), inset 10px 14px 28px rgba(255,255,255,.4), inset -10px -16px 30px rgba(60,110,220,.12), 0 22px 50px rgba(40,80,180,.18), 0 3px 8px rgba(40,80,180,.08);
+  background: #eef5ff;
+}
+body[data-pal="blue"] .bg { background: linear-gradient(135deg, #eef6ff 0%, #e9efff 45%, #e8fbff 100%); }
+body[data-pal="blue"] .lobby h1 .c, body[data-pal="blue"] .finaltitle .c, body[data-pal="blue"] .board h2 .c, body[data-pal="blue"] #scr h1 .c { background: linear-gradient(180deg, #102a6b, #2f6bff); -webkit-background-clip: text; background-clip: text; }
+body[data-pal="blue"] .btn:not(.ghost) { background: linear-gradient(140deg, rgba(70,130,255,.9), rgba(40,190,230,.75)); text-shadow: 0 1px 2px rgba(20,50,140,.3); }
+body[data-pal="blue"] .qrcard::after, body[data-pal="blue"] .btn::after, body[data-pal="blue"] .qhead::after, body[data-pal="blue"] .opt::after, body[data-pal="blue"] .row::after, body[data-pal="blue"] .col .block::after, body[data-pal="blue"] .result::after, body[data-pal="blue"] .timer::after {
+  background: conic-gradient(from var(--ang), rgba(90,150,255,.95), rgba(255,255,255,.2) 18%, rgba(90,220,255,.95) 35%, rgba(255,255,255,.2) 52%, rgba(120,120,255,.95) 68%, rgba(255,255,255,.2) 84%, rgba(90,150,255,.95)); }
+body[data-pal="blue"] .bignum { -webkit-text-stroke-color: rgba(47,107,255,.35); }
+body[data-pal="blue"] .timer .tprog { stroke: #2f6bff; }
+body[data-pal="blue"] .chip:hover { background: rgba(60,130,255,.25); }
+body[data-pal="blue"] .col.p2 .block { background: linear-gradient(160deg, rgba(190,215,255,.9), rgba(100,150,255,.5)); }
+body[data-pal="blue"] .col.p3 .block { background: linear-gradient(160deg, rgba(180,240,240,.9), rgba(60,200,210,.5)); }
+body[data-pal="blue"] .hero img.main { filter: drop-shadow(0 20px 40px rgba(20,50,140,.25)); }

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795277758">
+<link rel="stylesheet" href="style.css?v=1795278637">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -44,6 +44,7 @@
   .warn { color: var(--gold); font-size: 15px; }
 </style>
 <link rel="stylesheet" id="tc">
+<link rel="stylesheet" href="pal-blue.css?v=1795278637">
 </head>
 <body>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
@@ -51,16 +52,16 @@
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V = '1795277758'</script>
-<script src="lib/mqtt.min.js?v=1795277758"></script>
-<script src="common.js?v=1795277758"></script>
-<script src="lib/gsap.min.js?v=1795277758"></script>
-<script src="liquid.js?v=1795277758"></script>
-<script src="substance.js?v=1795277758"></script>
-<script src="stagefx.js?v=1795277758"></script>
-<script src="doodle.js?v=1795277758"></script>
-<script src="nerdfx.js?v=1795277758"></script>
-<script src="fx.js?v=1795277758"></script>
+<script>window.VQ_V = '1795278637'</script>
+<script src="lib/mqtt.min.js?v=1795278637"></script>
+<script src="common.js?v=1795278637"></script>
+<script src="lib/gsap.min.js?v=1795278637"></script>
+<script src="liquid.js?v=1795278637"></script>
+<script src="substance.js?v=1795278637"></script>
+<script src="stagefx.js?v=1795278637"></script>
+<script src="doodle.js?v=1795278637"></script>
+<script src="nerdfx.js?v=1795278637"></script>
+<script src="fx.js?v=1795278637"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -75,6 +76,7 @@ const scr = document.getElementById('scr');
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 const room = (params.get('r') || '').toUpperCase().replace(/[^A-Z]/g, '');
 VQ.applyTheme(params.get('theme') || ls.get('vq_theme') || 'glass');
+document.body.dataset.pal = ls.get('vq_pal') || 'pink';
 let myId = ls.get('vq_id'); if (!myId) { myId = VQ.rid(14); ls.set('vq_id', myId); }
 let myName = ls.get('vq_name') || '';
 const JK = 'vq_joined_' + room;
@@ -113,6 +115,7 @@ function onState(m) {
   if (!m) { if (S) { S = null; scr.innerHTML = `<div class="big">👋</div><h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
   const first = !S; S = m;
   if (S.th && S.th !== document.body.dataset.theme) { VQ.applyTheme(S.th); ls.set('vq_theme', S.th); }
+  if ((S.pa || 'pink') !== document.body.dataset.pal) { document.body.dataset.pal = S.pa || 'pink'; ls.set('vq_pal', document.body.dataset.pal); }
   if (joined && S.pl[myId]) confirmed = true;
   if (joined && confirmed && !S.pl[myId]) { joined = false; confirmed = false; ls.del(JK); }
   if (joined && !S.pl[myId] && first) sendJoin();
