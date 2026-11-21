@@ -135,3 +135,6 @@ input::placeholder { color: rgba(255,255,255,.35); }
 .dots i { background: var(--mag); }
 .top .pts { color: var(--mag); font-weight: 800; }
 @media (prefers-reduced-motion: reduce) { .bg::before, .bg::after { animation: none; } }
+#scr .opt { background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, var(--bg1)), var(--bg1) 70%) !important; }
+#scr .opt:active { background: var(--grad) !important; transform: scale(.96); }
+.qtext { font-family: var(--fd); font-size: 26px; font-weight: 800; line-height: 1.05; }

@@ -183,8 +183,8 @@ const VQ = (() => {
 
   /* ---------- Стилі ---------- */
   const THEMES = {
-    city: { name: 'Ігрове місто', fonts: 'Rubik:wght@500;700;800;900' },
     nerd: { name: 'Нердактик', fonts: 'Fira+Sans+Extra+Condensed:ital,wght@0,700;0,800;0,900;1,800&family=Montserrat:wght@500;600;700;800' },
+    city: { name: 'Ігрове місто', fonts: 'Rubik:wght@500;700;800;900' },
     party: { name: 'Паті-постер', fonts: 'Neucha&family=Caveat:wght@600;700&family=Montserrat:wght@500;700;800' },
     show: { name: 'Скло-шоу', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@500;600;700;800' },
     glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
@@ -195,7 +195,7 @@ const VQ = (() => {
     pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
   };
   function applyTheme(t) {
-    if (!THEMES[t]) t = 'show';
+    if (!THEMES[t]) t = 'nerd';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
