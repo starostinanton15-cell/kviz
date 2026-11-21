@@ -14,6 +14,7 @@
   `theme-show.css` = вміст `theme-glass.css` + блок «Скло-шоу» в кінці (зібрано конкатенацією; міняєш glass — збери show заново).
   Перемикач 🎨 у лобі; телефони беруть стиль зі стану (`th`).
 - Герой свята на першому екрані: `hero.webp` (фото без фону) + бульбашка з привітанням. Інше фото: кнопка «📷 Фото героя» в редакторі (PNG без фону, зберігається в localStorage `vq_hero`).
+- 3D (стилі show/glass): `liquid.js` — рідке скло на WebGL (краплі-метаболи, заломлення, тікають від курсора; `LQ.start/stop/pulse`, запускає `applyTheme`). `fx.js` — режисура на GSAP (`lib/gsap.min.js`): `FX.enter(фаза, stage)` після кожного draw, `FX.podium`, `FX.phone`. Під `body.gs` CSS-анімації й transition на transform/opacity вимкнені, бо ламають GSAP.
 - Звуки синтезуються WebAudio (`VQ.Sfx`), конфеті — canvas.
 - Кеш: у посиланнях на js/css стоїть `?v=<число>`. При кожному викладанні онови число в host.html та index.html (і `window.VQ_V`), інакше браузери тягнуть старе.
 

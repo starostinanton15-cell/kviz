@@ -208,6 +208,10 @@ const VQ = (() => {
       }
       bg.appendChild(b);
     }
+    if (window.LQ) {
+      const phone = !document.getElementById('stage');
+      if (t === 'glass' || t === 'show') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
+    }
     return t;
   }
   /* Кінетичний текст: кожна літера вилітає окремо */

@@ -73,3 +73,10 @@ h1, h2, .display { font-family: var(--fd, inherit); }
   .btn:active { scale: .97; }
   .chip:hover { scale: 1.1; }
 }
+
+/* WebGL-скло замість CSS-плям; GSAP сам веде входи, CSS-анімації вимикаємо */
+body.webgl .bg > i, body.webgl .bg::before, body.webgl .bg::after { display: none; }
+body.webgl .bg .bubbles { opacity: .55; }
+.gs .opt, .gs .qhead, .gs .row, .gs .qrcard, .gs .timer, .gs .answered, .gs .tline, .gs .intro .num, .gs .result, .gs .ticker.lob { animation: none !important; }
+body.webgl[data-theme="show"] .bg::before { display: block; z-index: 1; opacity: .5; }
+.gs .opt, .gs .qhead, .gs .row, .gs .qrcard, .gs .timer, .gs .answered, .gs .tline, .gs .intro .num, .gs .result, .gs .ticker.lob, .gs .bubble, .gs .bar i, .gs .bar b, .gs .col .who { transition: scale .35s cubic-bezier(.3, 1.6, .5, 1), filter .4s, box-shadow .4s !important; }

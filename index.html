@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795258898">
+<link rel="stylesheet" href="style.css?v=1795260390">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -51,9 +51,12 @@
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V='1795258898'</script>
-<script src="lib/mqtt.min.js?v=1795258898"></script>
-<script src="common.js?v=1795258898"></script>
+<script>window.VQ_V='1795260390'</script>
+<script src="lib/mqtt.min.js?v=1795260390"></script>
+<script src="common.js?v=1795260390"></script>
+<script src="lib/gsap.min.js?v=1795260390"></script>
+<script src="liquid.js?v=1795260390"></script>
+<script src="fx.js?v=1795260390"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -147,7 +150,7 @@ function show() {
       <div class="grid ${q.a.length === 2 ? 'n2' : ''}">${q.a.map((a, i) => `<button class="opt ans${i} pop" style="animation-delay:${i * 60}ms" data-i="${i}"><span class="letter">${LETTERS[i]}</span><span>${esc(a)}</span></button>`).join('')}</div>`;
     const tb = document.getElementById('tb'), total = q.time * 1000;
     const upd = () => { const left = Math.max(0, deadline - performance.now()); tb.style.width = (left / total * 100) + '%'; };
-    upd(); tbar = setInterval(upd, 100);
+    upd(); tbar = setInterval(upd, 100); window.FX && FX.phone('question', scr);
     scr.querySelectorAll('.opt').forEach(b => b.onclick = () => {
       const i = S.i, a = +b.dataset.i; if (myAns[i] != null) return;
       myAns[i] = a; vib(30); Sfx.init(); Sfx.pop();
@@ -169,6 +172,7 @@ function show() {
       <h2>${VQ.kin(ok === 1 ? 'Правильно!' : ok === 0 ? 'Мимо' : 'Не встиг')}</h2>
       ${ok === 1 ? `<div class="gain">+${gain}</div>` : `<div class="sub" style="color:#fff">Правильна відповідь:<br><b>${esc(cor)}</b></div>`}
     </div><div class="place rise">Ти на <b>${rank}</b> місці</div>`;
+    window.FX && FX.phone('reveal', scr, ok);
     return;
   }
   if (ph === 'board') {
