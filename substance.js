@@ -3,7 +3,7 @@
    pearl — рідкий перламутр (глянцева поверхня, що повільно перетікає); ink — пастельна фарба, що розпливається у воді.
    Курсор закручує субстанцію; SB.pulse() — сплеск на святкові моменти. */
 window.SB = (() => {
-  let gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'silk';
+  let gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
   const mouse = { x: .5, y: .5, tx: .5, ty: .5, on: 0, ton: 0 };
   const MODES = { silk: 0, pearl: 1, ink: 2 };
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
