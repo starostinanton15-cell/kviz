@@ -5,7 +5,7 @@ window.LQ = (() => {
 
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
   const FS = `precision highp float;
-uniform vec2 R; uniform float T; uniform vec4 B[10]; uniform int N; uniform float K;
+uniform vec2 R; uniform float T; uniform vec4 B[10]; uniform int N; uniform float K; uniform float DK;
 vec3 bg(vec2 uv){
   float t = T * .045;
   vec2 p1 = vec2(.18 + .14*sin(t*1.3), .30 + .18*cos(t));
@@ -14,9 +14,10 @@ vec3 bg(vec2 uv){
   vec2 p4 = vec2(.30 + .12*cos(t*1.7), .88 + .08*sin(t*1.2));
   vec2 p5 = vec2(.52 + .25*cos(t*.5), .50 + .2*sin(t*.6));
   vec3 c1 = vec3(1., .80, .90), c2 = vec3(.84, .79, 1.), c3 = vec3(.76, .89, 1.), c4 = vec3(.80, .97, .90), c5 = vec3(1., .91, .82);
+  if (DK > .5) { c1 = vec3(.04, .08, .22); c2 = vec3(.0, .22, .45); c3 = vec3(.02, .03, .07); c4 = vec3(.13, .19, .02); c5 = vec3(.03, .06, .16); }
   float w1 = 1./(.015+pow(distance(uv,p1),2.)), w2 = 1./(.015+pow(distance(uv,p2),2.)), w3 = 1./(.015+pow(distance(uv,p3),2.)), w4 = 1./(.015+pow(distance(uv,p4),2.)), w5 = 1./(.02+pow(distance(uv,p5),2.));
   vec3 c = (c1*w1 + c2*w2 + c3*w3 + c4*w4 + c5*w5) / (w1+w2+w3+w4+w5);
-  return mix(c, vec3(1.), .06);
+  return DK > .5 ? c : mix(c, vec3(1.), .06);
 }
 void main(){
   vec2 fc = gl_FragCoord.xy; vec2 uv = fc / R;
@@ -33,7 +34,7 @@ void main(){
   hue /= max(f, 1e-3);
   vec3 col = bg(uv);
   /* м'яка тінь під краплями */
-  col *= 1. - .10 * smoothstep(.45, 1.1, fs) * (1. - smoothstep(.9, 1.1, f));
+  col *= 1. - (DK > .5 ? .35 : .10) * smoothstep(.45, 1.1, fs) * (1. - smoothstep(.9, 1.1, f));
   float aa = fwidth(f) * 1.2 + 1e-4;
   float m = smoothstep(1. - aa, 1. + aa, f);
   if (m > 0.) {
@@ -42,12 +43,13 @@ void main(){
     vec3 refr = bg(uv - n.xy * .22 - vec2(0., .03));
     float ca = .012 * fr; refr = vec3(bg(uv - n.xy * (.22 + ca*8.)).r, refr.g, bg(uv - n.xy * (.22 - ca*8.)).b);
     vec3 iri = .5 + .5 * cos(6.2831 * (vec3(0., .33, .67) + fr * 1.3 + hue + T * .03));
+    if (DK > .5) iri = mix(vec3(.83, 1., 0.), vec3(0., .7, 1.), .5 + .5 * cos(6.2831 * (fr * 1.1 + hue + T * .03)));
     vec3 L = normalize(vec3(-.45, .6, .75));
     float sp = pow(max(dot(reflect(-L, n), vec3(0., 0., 1.)), 0.), 60.);
     float sp2 = pow(max(dot(reflect(-normalize(vec3(.5,-.4,.8)), n), vec3(0., 0., 1.)), 0.), 18.) * .25;
     vec3 glass = refr * 1.03 + vec3(.02, .02, .04);
-    glass = mix(glass, glass * .55 + iri * .6, smoothstep(.15, .9, fr) * .8);
-    glass *= mix(1., .78, smoothstep(.55, .95, fr));
+    glass = mix(glass, glass * .55 + iri * (DK > .5 ? .45 : .6), smoothstep(.15, .9, fr) * .8);
+    if (DK < .5) glass *= mix(1., .78, smoothstep(.55, .95, fr));
     glass += vec3(1.) * (sp * smoothstep(.08, .45, fr) * 1.2 + sp2);
     glass += vec3(1.) * smoothstep(.75, 1., fr) * .35;
     col = mix(col, glass, m);
@@ -68,7 +70,7 @@ void main(){
     gl.useProgram(prog);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ['R', 'T', 'B', 'N', 'K'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
+    ['R', 'T', 'B', 'N', 'K', 'DK'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
     addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
     addEventListener('resize', resize);
@@ -116,7 +118,7 @@ void main(){
     step(dt, t);
     const d = cv.width / innerWidth, arr = new Float32Array(40);
     blobs.forEach((b, i) => { arr[i * 4] = b.x * d; arr[i * 4 + 1] = (innerHeight - b.y) * d; arr[i * 4 + 2] = b.r * d; arr[i * 4 + 3] = b.hue; });
-    gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform4fv(uni.B, arr); gl.uniform1i(uni.N, blobs.length); gl.uniform1f(uni.K, 50 * d);
+    gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform4fv(uni.B, arr); gl.uniform1i(uni.N, blobs.length); gl.uniform1f(uni.K, 50 * d); gl.uniform1f(uni.DK, document.body.dataset.theme === 'show' ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   return {
