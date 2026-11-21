@@ -34,7 +34,8 @@
   .names { display: flex; flex-wrap: wrap; gap: 1vmin; max-height: 34vmin; overflow: hidden; align-content: flex-start; }
   .chip { background: var(--card); border: 1px solid var(--line); padding: .7vmin 1.8vmin; border-radius: 999px; font-size: 2.4vmin; font-weight: 700; cursor: pointer; }
   .chip:hover { background: rgba(255,93,115,.3); }
-  .bottom { display: flex; gap: 1.2vmin; align-items: center; justify-content: center; padding-top: 2vmin; }
+  .bottom { display: flex; flex-wrap: wrap; gap: 1.2vmin; align-items: center; justify-content: center; padding-top: 2vmin; }
+  @media (max-width: 800px) { .bottom .btn { font-size: 14px; padding: .7em 1.1em; } .lobby { grid-template-columns: 1fr; justify-items: center; text-align: center; } .names { justify-content: center; } }
   .bottom .btn { font-size: 2.6vmin; }
 
   /* Інтро */
