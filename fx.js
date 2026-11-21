@@ -91,7 +91,8 @@ window.FX = (() => {
     if (!active()) { document.body.classList.remove('gs'); return; }
     document.body.classList.add('gs');
     const q = s => [...root.querySelectorAll(s)];
-    if (ph === 'question') gsap.from(q('.opt'), { rotationX: -90, y: 40, opacity: 0, transformPerspective: 700, transformOrigin: '50% 0%', stagger: .08, duration: 1, ease: 'elastic.out(1,.75)' });
+    /* легка поява без 3D: на телефонах 3D-обертання скляних кнопок давало ривки */
+    if (ph === 'question') gsap.from(q('.opt'), { y: 26, scale: .94, opacity: 0, stagger: .06, duration: .5, ease: 'power3.out', clearProps: 'transform,opacity' });
     if (ph === 'reveal') {
       gsap.from(q('.result'), { scale: .3, rotation: ok === 1 ? -8 : 8, opacity: 0, duration: 1.1, ease: 'elastic.out(1,.45)' });
       if (ok === 0) gsap.fromTo(q('.result'), { x: 0 }, { x: 10, duration: .06, repeat: 7, yoyo: true, delay: .4, clearProps: 'x' });

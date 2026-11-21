@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795279506">
+<link rel="stylesheet" href="style.css?v=1795279843">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -44,24 +44,44 @@
   .warn { color: var(--gold); font-size: 15px; }
 </style>
 <link rel="stylesheet" id="tc">
-<link rel="stylesheet" href="pal-blue.css?v=1795279506">
+<link rel="stylesheet" href="pal-blue.css?v=1795279843">
+<style>
+  /* Телефон: легше для слабких GPU (без розмиття під кнопками й вічних анімацій на кожній) */
+  #scr .opt { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; animation: none; will-change: transform; }
+  #scr .opt::after, #scr .result::after { animation: none !important; }
+  #scr .result { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  /* Іконки замість емодзі: скляна куля з градієнтною лінією */
+  .ico { width: 104px; height: 104px; margin: 0 auto 4px; border-radius: 50%; display: grid; place-items: center; position: relative;
+    background: radial-gradient(circle at 32% 24%, #fff 0 14%, rgba(255,255,255,.75) 38%, rgba(255,255,255,.35) 72%, rgba(255,255,255,.2));
+    border: 1px solid rgba(255,255,255,.9); box-shadow: var(--gl-sh, 0 14px 30px rgba(0,0,0,.2)); animation: icoFloat 4.5s ease-in-out infinite; }
+  .ico svg { width: 52px; height: 52px; fill: none; stroke: url(#ig); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 4px rgba(80,60,180,.18)); }
+  .ico.sm { width: 84px; height: 84px; } .ico.sm svg { width: 42px; height: 42px; }
+  .result .ico { background: radial-gradient(circle at 32% 24%, #fff 0 14%, rgba(255,255,255,.92) 45%, rgba(255,255,255,.7)); }
+  .result.ok .ico svg { stroke: #13a477; } .result.bad .ico svg { stroke: #e2405f; }
+  .ico.medal { width: 150px; height: 150px; font: 900 76px/1 var(--fd, sans-serif); color: #fff; text-shadow: 0 3px 10px rgba(120,60,0,.35); }
+  .ico.m1 { background: radial-gradient(circle at 32% 24%, #fffbe8 0 10%, #ffd76a 40%, #f2a93b 85%); }
+  .ico.m2 { background: radial-gradient(circle at 32% 24%, #ffffff 0 10%, #e3e6f0 40%, #aab1c6 85%); text-shadow: 0 3px 10px rgba(40,50,90,.35); }
+  .ico.m3 { background: radial-gradient(circle at 32% 24%, #fff1e6 0 10%, #f6b98d 40%, #d0804d 85%); }
+  @keyframes icoFloat { 50% { translate: 0 -6px; } }
+</style>
 </head>
 <body>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--a0,#ff6b8a)"/><stop offset=".55" style="stop-color:var(--gold,#8b6bff)"/><stop offset="1" style="stop-color:var(--a3,#22c9aa)"/></linearGradient></defs></svg>
 <div id="app">
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V = '1795279506'</script>
-<script src="lib/mqtt.min.js?v=1795279506"></script>
-<script src="common.js?v=1795279506"></script>
-<script src="lib/gsap.min.js?v=1795279506"></script>
-<script src="liquid.js?v=1795279506"></script>
-<script src="substance.js?v=1795279506"></script>
-<script src="stagefx.js?v=1795279506"></script>
-<script src="doodle.js?v=1795279506"></script>
-<script src="nerdfx.js?v=1795279506"></script>
-<script src="fx.js?v=1795279506"></script>
+<script>window.VQ_V = '1795279843'</script>
+<script src="lib/mqtt.min.js?v=1795279843"></script>
+<script src="common.js?v=1795279843"></script>
+<script src="lib/gsap.min.js?v=1795279843"></script>
+<script src="liquid.js?v=1795279843"></script>
+<script src="substance.js?v=1795279843"></script>
+<script src="stagefx.js?v=1795279843"></script>
+<script src="doodle.js?v=1795279843"></script>
+<script src="nerdfx.js?v=1795279843"></script>
+<script src="fx.js?v=1795279843"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -83,6 +103,22 @@ const JK = 'vq_joined_' + room;
 let joined = ls.get(JK) === '1', confirmed = false;
 let S = null, shownKey = '', deadline = 0, myAns = {}, resendT = null, net = null, status = 'connecting', tbar = null;
 
+const ICONS = {
+  check: '<path d="M5 12.5l4.6 4.6L19.2 7.4"/>',
+  cross: '<path d="M7 7l10 10M17 7L7 17"/>',
+  clock: '<circle cx="12" cy="12" r="8.2"/><path d="M12 7.8v4.6l3 1.9"/>',
+  bolt: '<path d="M13.2 3L5.5 13.4h5.9L10.6 21l7.9-10.6h-6z"/>',
+  wait: '<path d="M7 3.8h10M7 20.2h10M8 4c0 4.5 8 5 8 8s-8 3.5-8 8M16 4c0 4.5-8 5-8 8s8 3.5 8 8"/>',
+  bars: '<path d="M6 19.5V12M12 19.5V5M18 19.5V9"/>',
+  star: '<path d="M12 3.6l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
+  user: '<circle cx="12" cy="8.2" r="3.7"/><path d="M5 20c1.2-3.7 4-5.5 7-5.5s5.8 1.8 7 5.5"/>',
+  alert: '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5.2M12 16.3v.2"/>',
+  heart: '<path d="M12 19.8s-7.2-4.4-7.2-10a4.1 4.1 0 0 1 7.2-2.7 4.1 4.1 0 0 1 7.2 2.7c0 5.6-7.2 10-7.2 10z"/>',
+  hash: '<path d="M9.5 4L7.5 20M16.5 4l-2 16M4.5 9h15.5M4 15h15.5"/>'
+};
+const ico = (k, cls = '') => `<div class="ico ${cls}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg></div>`;
+function icoIn() { const e = scr.querySelector('.ico'); if (e && window.gsap) gsap.from(e, { scale: .3, rotation: -25, opacity: 0, duration: .9, ease: 'elastic.out(1,.55)' }); }
+new MutationObserver(icoIn).observe(document.getElementById('scr'), { childList: true });
 function vib(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
 function setTop() {
   document.getElementById('me').innerHTML = `<span class="dot ${status}"></span>` + (joined && myName ? esc((S && S.pl && S.pl[myId]) || myName) : (status === 'online' ? 'На зв\'язку' : 'Підключення…'));
@@ -92,7 +128,7 @@ function setTop() {
 
 /* ---------- Без коду кімнати ---------- */
 if (!room) {
-  scr.innerHTML = `<div class="big pop">🎯</div><h1>Введи код гри</h1><div class="sub">Він на великому екрані під QR-кодом</div>
+  scr.innerHTML = `${ico('hash')}<h1>Введи код гри</h1><div class="sub">Він на великому екрані під QR-кодом</div>
     <input id="code" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="КОД"><button class="btn" id="go">Далі</button>`;
   const go = () => { const c = document.getElementById('code').value.trim().toUpperCase().replace(/[^A-Z]/g, ''); if (c.length >= 4) location.search = '?r=' + c; };
   document.getElementById('go').onclick = go;
@@ -106,13 +142,13 @@ if (!room) {
     onConnect: () => { if (joined && myName) sendJoin(); },
     onMessage: (t, m) => onState(m)
   });
-  setTimeout(() => { if (!S) scr.innerHTML = `<div class="big">😕</div><h1>Гру не знайдено</h1><div class="sub">Перевір інтернет або відскануй QR-код ще раз</div><button class="btn ghost" onclick="location.reload()">Спробувати ще</button>`; }, 15000);
+  setTimeout(() => { if (!S) scr.innerHTML = `${ico('alert')}<h1>Гру не знайдено</h1><div class="sub">Перевір інтернет або відскануй QR-код ще раз</div><button class="btn ghost" onclick="location.reload()">Спробувати ще</button>`; }, 15000);
 }
 function sendJoin() { net && net.pub(VQ.topic(room) + '/p', { t: 'join', id: myId, name: myName }); }
 function sendAns(i, a) { net && net.pub(VQ.topic(room) + '/p', { t: 'ans', id: myId, q: i, a }); }
 
 function onState(m) {
-  if (!m) { if (S) { S = null; scr.innerHTML = `<div class="big">👋</div><h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
+  if (!m) { if (S) { S = null; scr.innerHTML = `${ico('heart')}<h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
   const first = !S; S = m;
   if (S.th && S.th !== document.body.dataset.theme) { VQ.applyTheme(S.th); ls.set('vq_theme', S.th); }
   if ((S.pa || 'pink') !== document.body.dataset.pal) { document.body.dataset.pal = S.pa || 'pink'; ls.set('vq_pal', document.body.dataset.pal); }
@@ -137,19 +173,19 @@ function show() {
   shownKey = key; clearInterval(tbar);
   const ph = S.ph, n = Object.keys(S.pl).length;
   if (ph === 'lobby') {
-    scr.innerHTML = `<div class="big pop">🎉</div><h1>${VQ.kin('Ти в грі!')}</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
+    scr.innerHTML = `${ico('check')}<h1>${VQ.kin('Ти в грі!')}</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
       <button class="btn ghost" id="rename" style="margin-top:20px">Змінити ім'я</button>`;
     document.getElementById('rename').onclick = () => { joined = false; ls.del(JK); renderJoin(); };
     return;
   }
   if (ph === 'intro') {
-    scr.innerHTML = `<div class="sub">Питання ${S.i + 1} з ${S.n}</div><div class="big pop">⚡</div><h1>${VQ.kin('Готуйся!')}</h1>`;
+    scr.innerHTML = `<div class="sub">Питання ${S.i + 1} з ${S.n}</div>${ico('bolt')}<h1>${VQ.kin('Готуйся!')}</h1>`;
     vib(60); return;
   }
   if (ph === 'question') {
     const q = S.q;
     if (myAns[S.i] != null) {
-      scr.innerHTML = `<div class="big pop">🤞</div><h1>Відповідь прийнята</h1><div class="sub">Чекаємо на інших…</div>`;
+      scr.innerHTML = `${ico('wait')}<h1>Відповідь прийнята</h1><div class="sub">Чекаємо на інших…</div>`;
       return;
     }
     scr.style.justifyContent = 'stretch';
@@ -175,7 +211,7 @@ function show() {
     if (ok === 1) { Sfx.init(); Sfx.correct(); vib([40, 60, 40]); }
     else if (ok === 0) { Sfx.init(); Sfx.wrong(); vib(300); }
     scr.innerHTML = `<div class="result ${ok === 1 ? 'ok' : ok === 0 ? 'bad' : 'none'} pop ${ok === 0 ? 'shake' : ''}">
-      <div class="big">${ok === 1 ? '🎉' : ok === 0 ? '😬' : '🙈'}</div>
+      ${ico(ok === 1 ? 'check' : ok === 0 ? 'cross' : 'clock', 'sm')}
       <h2>${VQ.kin(ok === 1 ? 'Правильно!' : ok === 0 ? 'Мимо' : 'Не встиг')}</h2>
       ${ok === 1 ? `<div class="gain">+${gain}</div>` : `<div class="sub" style="color:#fff">Правильна відповідь:<br><b>${esc(cor)}</b></div>`}
     </div><div class="place rise">Ти на <b>${rank}</b> місці</div>`;
@@ -183,17 +219,17 @@ function show() {
     return;
   }
   if (ph === 'board') {
-    scr.innerHTML = `<div class="big pop">📊</div><div class="place">Ти на <b>${r ? r[3] : '—'}</b> місці</div><div class="sub">${r ? r[2] : 0} балів</div><div class="sub">Наступне питання вже скоро</div>`;
+    scr.innerHTML = `${ico('bars')}<div class="place">Ти на <b>${r ? r[3] : '—'}</b> місці</div><div class="sub">${r ? r[2] : 0} балів</div><div class="sub">Наступне питання вже скоро</div>`;
     return;
   }
   if (ph === 'final') {
-    const rank = r ? r[3] : null, medal = { 1: '🥇', 2: '🥈', 3: '🥉' }[rank];
+    const rank = r ? r[3] : null, medal = rank >= 1 && rank <= 3;
     scr.innerHTML = `<div class="dots"><i></i><i></i><i></i></div><h1>Хто ж переможе?</h1><div class="sub">Дивись на екран!</div>`;
     setTimeout(() => {
       if (S.ph !== 'final') return;
       scr.innerHTML = medal
-        ? `<div class="medal pop">${medal}</div><h1 class="rise">${rank} місце!</h1><div class="sub">${r[2]} балів. Ти супер!</div>`
-        : `<div class="big pop">🙌</div><h1 class="rise">Твоє місце: ${rank ?? '—'}</h1><div class="sub">${r ? r[2] : 0} балів. Дякуємо за гру!</div>`;
+        ? `<div class="ico medal m${rank}">${rank}</div><h1 class="rise">${rank} місце!</h1><div class="sub">${r[2]} балів. Ти супер!</div>`
+        : `${ico('star')}<h1 class="rise">Твоє місце: ${rank ?? '—'}</h1><div class="sub">${r ? r[2] : 0} балів. Дякуємо за гру!</div>`;
       if (medal) { VQ.confetti(6000, 160); vib([80, 80, 200]); }
     }, 9400);
   }
@@ -201,7 +237,7 @@ function show() {
 
 function renderJoin() {
   shownKey = 'join';
-  scr.innerHTML = `<div class="big pop">👋</div><h1>${VQ.kin((S && S.title) || 'Квіз')}</h1><div class="sub">Як тебе звати?</div>
+  scr.innerHTML = `${ico('user')}<h1>${VQ.kin((S && S.title) || 'Квіз')}</h1><div class="sub">Як тебе звати?</div>
     <input id="nm" maxlength="20" autocomplete="off" placeholder="Твоє ім'я" value="${esc(myName)}">
     <button class="btn" id="go">Увійти в гру</button><div class="warn" id="w"></div>`;
   const nm = document.getElementById('nm');

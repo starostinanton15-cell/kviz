@@ -3,7 +3,7 @@
    pearl — рідкий перламутр (глянцева поверхня, що повільно перетікає); ink — пастельна фарба, що розпливається у воді.
    Курсор закручує субстанцію; SB.pulse() — сплеск на святкові моменти. */
 window.SB = (() => {
-  let pa = 0, gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
+  let fps = 0, pa = 0, gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
   const mouse = { x: .5, y: .5, tx: .5, ty: .5, on: 0, ton: 0 };
   const MODES = { silk: 0, pearl: 1, ink: 2 };
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
@@ -109,13 +109,14 @@ void main(){
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (document.hidden) return;
+    if (fps && last && now - last < 1000 / fps - 2) return; /* телефон: 30 кадрів досить для повільної фарби */
     const t = (now - t0) / 1000, dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
     draw(t, dt);
   }
   return {
     start(o = {}) {
       if (running) return true;
-      scale = o.scale || scale; mode = o.mode || mode;
+      scale = o.scale || scale; mode = o.mode || mode; fps = o.fps || 0;
       try { if (!gl && !init()) return false; } catch (e) { console.warn('WebGL off', e); return false; }
       const bg = document.querySelector('.bg'); bg.insertBefore(cv, bg.firstChild);
       document.body.classList.add('webgl'); resize(); running = true; last = 0; raf = requestAnimationFrame(frame);

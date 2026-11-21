@@ -227,7 +227,7 @@ const VQ = (() => {
     if (window.SB) {
       const phone = !document.getElementById('stage');
       const qs = new URLSearchParams(location.search).get('sub'); if (qs) document.body.dataset.sub = qs;
-      if (t === 'glass') SB.start({ scale: phone ? .35 : .5 }); else SB.stop();
+      if (t === 'glass') SB.start(phone ? { scale: .25, fps: 30 } : { scale: .5 }); else SB.stop();
     }
     if (window.SW) { if (t === 'glass' && document.getElementById('stage')) SW.start(); else SW.stop(); }
     if (window.ST) {
