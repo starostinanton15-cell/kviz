@@ -3,6 +3,7 @@ window.FX = (() => {
   const THEMES = ['show', 'glass'];
   const active = () => !!window.gsap && THEMES.includes(document.body.dataset.theme);
   const SK = () => document.body.dataset.theme === 'show' ? -9 : 0;
+  const boom = () => { if (window.LQ && LQ.on) LQ.pulse(); if (window.ST && ST.on) ST.pulse(); };
   const R = (a, b) => a + Math.random() * (b - a);
   let tiltEls = [], tl = null;
 
@@ -54,7 +55,7 @@ window.FX = (() => {
         .fromTo(win, { scale: 1 }, { scale: 1.07, duration: 1, ease: 'elastic.out(1,.3)' }, .15)
         .from(q('.bar i'), { scaleY: 0, transformOrigin: '50% 100%', duration: 1.2, ease: 'elastic.out(1,.5)', stagger: .07 }, .2)
         .from(q('.bar b'), { y: 30, opacity: 0, stagger: .07, duration: .6 }, .5);
-      window.LQ && LQ.on && setTimeout(() => LQ.pulse(), 250);
+      setTimeout(boom, 250);
     }
     if (ph === 'board') {
       const rows = q('.row'); prep(rows); prep(q('h2'));
@@ -83,7 +84,7 @@ window.FX = (() => {
     const col = document.getElementById('col' + n); if (!col) return;
     gsap.from(col.querySelector('.who'), { y: -60, scale: .4, opacity: 0, duration: 1, ease: 'elastic.out(1,.5)', delay: .5 });
     gsap.fromTo(stage, { y: 0 }, { y: n === 1 ? 14 : 7, duration: .07, repeat: n === 1 ? 7 : 3, yoyo: true, ease: 'none', clearProps: 'transform', delay: .25 });
-    if (n === 1 && window.LQ && LQ.on) LQ.pulse();
+    if (n === 1) boom();
   }
   /* Телефон гостя */
   function phone(ph, root, ok) {
@@ -94,7 +95,7 @@ window.FX = (() => {
     if (ph === 'reveal') {
       gsap.from(q('.result'), { scale: .3, rotation: ok === 1 ? -8 : 8, opacity: 0, duration: 1.1, ease: 'elastic.out(1,.45)' });
       if (ok === 0) gsap.fromTo(q('.result'), { x: 0 }, { x: 10, duration: .06, repeat: 7, yoyo: true, delay: .4, clearProps: 'x' });
-      if (ok === 1 && window.LQ && LQ.on) LQ.pulse();
+      if (ok === 1) boom();
     }
   }
   return { enter, podium, phone, active };
