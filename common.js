@@ -195,7 +195,7 @@ const VQ = (() => {
     pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
   };
   function applyTheme(t) {
-    if (!THEMES[t]) t = 'show';
+    if (!THEMES[t]) t = 'glass';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     const qbg = new URLSearchParams(location.search).get('bg'); if (qbg) document.body.dataset.bg = qbg;

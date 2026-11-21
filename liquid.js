@@ -2,6 +2,12 @@
    LQ.start(opts) — запуск (тільки для стилів show/glass), LQ.stop(), LQ.pulse() — сплеск на святкові моменти. */
 window.LQ = (() => {
   /* Палітри фону для темного режиму (стиль show). Вибір: body[data-bg]. */
+  /* Світлі палітри для стилю glass (без вибору — стара пастель). */
+  const LPALS = {
+    sunset: [[1,.70,.72],[1,.82,.60],[.86,.72,1],[1,.62,.82],[1,.90,.78]],
+    sky:    [[.70,.84,1],[.80,.74,1],[.66,.95,.96],[.92,.80,1],[.86,.93,1]],
+    candy:  [[1,.66,.86],[.72,.86,1],[1,.93,.62],[.78,1,.86],[.90,.74,1]],
+  };
   const PALS = {
     old:   { p: [[.04,.08,.22],[0,.22,.45],[.02,.03,.07],[.13,.19,.02],[.03,.06,.16]], ia: [.83,1,0], ib: [0,.7,1] },
     night: { p: [[.42,.07,.50],[.13,.06,.42],[.04,.02,.12],[.62,.16,.30],[.22,.06,.34]], ia: [1,.45,.75], ib: [1,.78,.25] },
@@ -12,7 +18,7 @@ window.LQ = (() => {
 
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
   const FS = `precision highp float;
-uniform vec2 R; uniform float T; uniform vec4 B[10]; uniform int N; uniform float K; uniform float DK; uniform vec3 P[5]; uniform vec3 IA; uniform vec3 IB;
+uniform vec2 R; uniform float T; uniform vec4 B[10]; uniform int N; uniform float K; uniform float DK; uniform vec3 P[5]; uniform vec3 IA; uniform vec3 IB; uniform vec3 Q[5]; uniform float QL;
 vec3 bg(vec2 uv){
   float t = T * .045;
   vec2 p1 = vec2(.18 + .14*sin(t*1.3), .30 + .18*cos(t));
@@ -21,6 +27,7 @@ vec3 bg(vec2 uv){
   vec2 p4 = vec2(.30 + .12*cos(t*1.7), .88 + .08*sin(t*1.2));
   vec2 p5 = vec2(.52 + .25*cos(t*.5), .50 + .2*sin(t*.6));
   vec3 c1 = vec3(1., .80, .90), c2 = vec3(.84, .79, 1.), c3 = vec3(.76, .89, 1.), c4 = vec3(.80, .97, .90), c5 = vec3(1., .91, .82);
+  if (QL > .5) { c1 = Q[0]; c2 = Q[1]; c3 = Q[2]; c4 = Q[3]; c5 = Q[4]; }
   if (DK > .5) { c1 = P[0]; c2 = P[1]; c3 = P[2]; c4 = P[3]; c5 = P[4]; }
   float w1 = 1./(.015+pow(distance(uv,p1),2.)), w2 = 1./(.015+pow(distance(uv,p2),2.)), w3 = 1./(.015+pow(distance(uv,p3),2.)), w4 = 1./(.015+pow(distance(uv,p4),2.)), w5 = 1./(.02+pow(distance(uv,p5),2.));
   vec3 c = (c1*w1 + c2*w2 + c3*w3 + c4*w4 + c5*w5) / (w1+w2+w3+w4+w5);
@@ -77,7 +84,7 @@ void main(){
     gl.useProgram(prog);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ['R', 'T', 'B', 'N', 'K', 'DK', 'IA', 'IB'].forEach(k => uni[k] = gl.getUniformLocation(prog, k)); uni.P = gl.getUniformLocation(prog, 'P[0]');
+    ['R', 'T', 'B', 'N', 'K', 'DK', 'IA', 'IB'].forEach(k => uni[k] = gl.getUniformLocation(prog, k)); uni.P = gl.getUniformLocation(prog, 'P[0]'); uni.Q = gl.getUniformLocation(prog, 'Q[0]'); uni.QL = gl.getUniformLocation(prog, 'QL');
     addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
     addEventListener('resize', resize);
@@ -125,7 +132,7 @@ void main(){
     step(dt, t);
     const d = cv.width / innerWidth, arr = new Float32Array(40);
     blobs.forEach((b, i) => { arr[i * 4] = b.x * d; arr[i * 4 + 1] = (innerHeight - b.y) * d; arr[i * 4 + 2] = b.r * d; arr[i * 4 + 3] = b.hue; });
-    gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform4fv(uni.B, arr); gl.uniform1i(uni.N, blobs.length); gl.uniform1f(uni.K, 50 * d); gl.uniform1f(uni.DK, document.body.dataset.theme === 'show' ? 1 : 0); const pl = PALS[document.body.dataset.bg] || PALS.old; gl.uniform3fv(uni.P, pl.p.flat()); gl.uniform3fv(uni.IA, pl.ia); gl.uniform3fv(uni.IB, pl.ib);
+    gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform4fv(uni.B, arr); gl.uniform1i(uni.N, blobs.length); gl.uniform1f(uni.K, 50 * d); gl.uniform1f(uni.DK, document.body.dataset.theme === 'show' ? 1 : 0); const pl = PALS[document.body.dataset.bg] || PALS.old; gl.uniform3fv(uni.P, pl.p.flat()); gl.uniform3fv(uni.IA, pl.ia); gl.uniform3fv(uni.IB, pl.ib); const lp = LPALS[document.body.dataset.bg]; gl.uniform1f(uni.QL, lp ? 1 : 0); if (lp) gl.uniform3fv(uni.Q, lp.flat());
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   return {
