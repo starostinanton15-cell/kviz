@@ -3,7 +3,7 @@ window.FX = (() => {
   const THEMES = ['show', 'glass', 'city', 'nerd', 'party'];
   const active = () => !!window.gsap && THEMES.includes(document.body.dataset.theme);
   const SK = () => document.body.dataset.theme === 'show' ? -9 : 0;
-  const boom = () => { if (window.LQ && LQ.on) LQ.pulse(); if (window.ST && ST.on) ST.pulse(); if (window.DD && DD.on) DD.pulse(); if (window.NF && NF.on) NF.pulse(); };
+  const boom = () => { if (window.LQ && LQ.on) LQ.pulse(); if (window.SB && SB.on) SB.pulse(); if (window.ST && ST.on) ST.pulse(); if (window.DD && DD.on) DD.pulse(); if (window.NF && NF.on) NF.pulse(); };
   const R = (a, b) => a + Math.random() * (b - a);
   let tiltEls = [], tl = null;
 

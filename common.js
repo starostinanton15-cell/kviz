@@ -203,7 +203,7 @@ const VQ = (() => {
     document.getElementById('tc').href = 'theme-' + t + '.css?v=' + (window.VQ_V || '');
     const bg = document.querySelector('.bg');
     bg && bg.querySelectorAll('.bubbles').forEach(e => e.remove());
-    if (bg && (t === 'glass' || t === 'show')) {
+    if (bg && t === 'show') {
       const b = document.createElement('div'); b.className = 'bubbles';
       for (let k = 0; k < 18; k++) {
         const sz = 14 + Math.random() * 90, sp = document.createElement('span');
@@ -214,7 +214,7 @@ const VQ = (() => {
     }
     if (window.LQ) {
       const phone = !document.getElementById('stage');
-      if (t === 'glass' || t === 'show') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
+      if (t === 'show') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
     }
     if (window.NF) {
       const phone = !document.getElementById('stage');
@@ -223,6 +223,11 @@ const VQ = (() => {
     if (window.DD) {
       const phone = !document.getElementById('stage');
       if (t === 'city' || t === 'party') DD.start({ scale: phone ? .7 : .6, small: phone, mode: t }); else DD.stop();
+    }
+    if (window.SB) {
+      const phone = !document.getElementById('stage');
+      const qs = new URLSearchParams(location.search).get('sub'); if (qs) document.body.dataset.sub = qs;
+      if (t === 'glass') SB.start({ scale: phone ? .35 : .5 }); else SB.stop();
     }
     if (window.ST) {
       const phone = !document.getElementById('stage');
