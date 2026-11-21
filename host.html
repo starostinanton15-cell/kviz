@@ -233,7 +233,7 @@ let G = null;
 function newGame() {
   const p = parseQuiz(quizText());
   const code = Array.from(crypto.getRandomValues(new Uint8Array(5)), b => 'ABCDEFGHJKLMNPRSTUVWXYZ'[b % 23]).join('');
-  G = { room: code, broker: 0, theme: (G && G.theme) || 'show', title: p.quiz.title, greet: p.quiz.greet, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
+  G = { room: code, broker: 0, theme: (G && G.theme) || 'studio', title: p.quiz.title, greet: p.quiz.greet, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
   save();
 }
 function save() { ls.set(LS_GAME, JSON.stringify(G)); }

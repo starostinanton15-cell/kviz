@@ -183,6 +183,7 @@ const VQ = (() => {
 
   /* ---------- Стилі ---------- */
   const THEMES = {
+    studio: { name: 'Студія свята', fonts: 'Onest:wght@400;500;600;700;800;900' },
     show: { name: 'Скло-шоу', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@500;600;700;800' },
     glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
     edit: { name: 'Журнал', fonts: 'Inter+Tight:ital,wght@0,500;0,700;0,800;0,900;1,900&family=Cormorant+Garamond:ital,wght@1,500;1,600' },
@@ -192,7 +193,7 @@ const VQ = (() => {
     pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
   };
   function applyTheme(t) {
-    if (!THEMES[t]) t = 'show';
+    if (!THEMES[t]) t = 'studio';
     if (document.body.dataset.theme === t) return t;
     document.body.dataset.theme = t;
     document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
@@ -214,7 +215,7 @@ const VQ = (() => {
     }
     if (window.ST) {
       const phone = !document.getElementById('stage');
-      if (t === 'show') ST.start({ scale: phone ? .5 : .6, small: phone }); else ST.stop();
+      if (t === 'show' || t === 'studio') ST.start({ scale: phone ? .5 : .6, small: phone, light: t === 'studio' }); else ST.stop();
     }
     return t;
   }

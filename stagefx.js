@@ -2,14 +2,15 @@
    ST.start() / ST.stop() — запускає applyTheme, ST.pulse() — сплеск на святкові моменти (правильна відповідь, переможець). */
 window.ST = (() => {
   const COLS = ['212,255,0', '0,178,255', '255,95,162', '255,184,0', '160,120,255'];
-  let cv, cx, raf = 0, W = 0, H = 0, sc = .5, on = false, boost = 0, t0 = 0, beams = [], rib = [], sp = [], small = false;
+  const LCOLS = ['31,107,255', '255,79,109', '255,179,26', '150,205,0'];
+  let cv, cx, raf = 0, W = 0, H = 0, sc = .5, on = false, boost = 0, t0 = 0, beams = [], rib = [], sp = [], small = false, light = false;
   const R = (a, b) => a + Math.random() * (b - a);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function resize() { W = cv.width = Math.round(innerWidth * sc); H = cv.height = Math.round(innerHeight * sc); }
   function ribbon(y) {
     return { x: R(0, W), y: y ?? R(-H, H), len: R(.16, .3) * H, w: R(5, 9) * sc * 2, vy: R(.25, .6) * sc * 2, vx: R(-.2, .2) * sc * 2,
-      ph: R(0, 6.28), sp: R(1.2, 2.2), amp: R(10, 22) * sc * 2, c: COLS[Math.floor(R(0, COLS.length))] };
+      ph: R(0, 6.28), sp: R(1.2, 2.2), amp: R(10, 22) * sc * 2, c: (light ? LCOLS : COLS)[Math.floor(R(0, 4))] };
   }
   function seed() {
     beams = [
@@ -17,7 +18,7 @@ window.ST = (() => {
       { x: .64, c: COLS[0], a: .2, s: .21, w: .12 }, { x: .9, c: COLS[3], a: .26, s: .19, w: .15 }
     ].map(b => ({ ...b, ph: R(0, 6.28) }));
     rib = Array.from({ length: small ? 5 : 9 }, () => ribbon());
-    sp = Array.from({ length: small ? 22 : 46 }, () => ({ x: R(0, 1), y: R(0, 1), r: R(1.5, 4), ph: R(0, 6.28), f: R(.6, 1.6), c: Math.random() < .5 ? '255,255,255' : COLS[Math.floor(R(0, 4))] }));
+    sp = Array.from({ length: small ? 22 : 46 }, () => ({ x: R(0, 1), y: R(0, 1), r: R(1.5, 4), ph: R(0, 6.28), f: R(.6, 1.6), c: !light && Math.random() < .5 ? '255,255,255' : (light ? LCOLS : COLS)[Math.floor(R(0, 4))] }));
   }
   function star(x, y, r, a, c) {
     cx.fillStyle = `rgba(${c},${a})`; cx.beginPath();
@@ -27,9 +28,9 @@ window.ST = (() => {
     if (!on) return;
     const t = (now - t0) / 1000; boost *= .965;
     cx.clearRect(0, 0, W, H);
-    cx.globalCompositeOperation = 'lighter';
+    cx.globalCompositeOperation = light ? 'source-over' : 'lighter';
     /* прожектори зверху, повільно гуляють */
-    for (const b of beams) {
+    if (!light) for (const b of beams) {
       const ang = Math.sin(t * b.s + b.ph) * .5, x0 = b.x * W, len = H * 1.25, hw = len * Math.tan(b.w / 2 + boost * .03);
       const ex = x0 + Math.sin(ang) * len, ey = Math.cos(ang) * len, nx = Math.cos(ang) * hw, ny = -Math.sin(ang) * hw;
       const g = cx.createLinearGradient(x0, 0, ex, ey);
@@ -62,8 +63,8 @@ window.ST = (() => {
   return {
     get on() { return on; },
     start(o = {}) {
-      if (on) return;
-      small = !!o.small; sc = o.scale || .5;
+      if (on) this.stop();
+      small = !!o.small; sc = o.scale || .5; light = !!o.light;
       cv = document.createElement('canvas'); cv.id = 'stfx';
       cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
       const bg = document.querySelector('.bg'); if (!bg) return;
