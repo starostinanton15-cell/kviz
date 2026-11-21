@@ -229,6 +229,7 @@ const VQ = (() => {
       const qs = new URLSearchParams(location.search).get('sub'); if (qs) document.body.dataset.sub = qs;
       if (t === 'glass') SB.start({ scale: phone ? .35 : .5 }); else SB.stop();
     }
+    if (window.SW) { if (t === 'glass' && document.getElementById('stage')) SW.start(); else SW.stop(); }
     if (window.ST) {
       const phone = !document.getElementById('stage');
       if (false) ST.start({ scale: phone ? .5 : .6, small: phone }); else ST.stop();

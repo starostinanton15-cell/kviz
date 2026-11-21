@@ -11,7 +11,7 @@ window.FX = (() => {
 
   /* Нахил за курсором: об'єм */
   addEventListener('pointermove', e => {
-    if (!active()) return;
+    if (!active() || document.body.dataset.theme === 'glass') return; /* у glass рух постійний (sway.js), не від мишки */
     tiltEls = tiltEls.filter(el => el.isConnected);
     for (const el of tiltEls) {
       const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;

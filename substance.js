@@ -100,7 +100,7 @@ void main(){
     mouse.on += (mouse.ton - mouse.on) * Math.min(1, dt * 2);
     const m = MODES[document.body.dataset.sub] ?? MODES[mode] ?? 0;
     gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform1f(uni.M, m);
-    gl.uniform3f(uni.MS, mouse.x, mouse.y, mouse.on * .6 + boost); gl.uniform1f(uni.BO, boost);
+    gl.uniform3f(uni.MS, .5, .5, boost * .6); /* без реакції на мишку — Антон попросив */ gl.uniform1f(uni.BO, boost);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function frame(now) {
