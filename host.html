@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
   #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: 3vmin 4vmin; }
@@ -17,6 +17,11 @@
   .center { flex: 1; display: grid; place-items: center; text-align: center; }
 
   /* Лобі */
+  .ticker.lob { font-size: 2.2vmin; font-weight: 800; padding: 1vmin 0; margin: 0 -4vmin 2vmin; text-transform: uppercase; letter-spacing: .08em; }
+  .bignum { position: absolute; right: 2vmin; bottom: 0; font-size: 40vmin; line-height: .8; font-weight: 900; opacity: .07; pointer-events: none; font-family: var(--fd); }
+  .tline { height: 1.1vmin; border-radius: 9px; background: rgba(255,255,255,.1); overflow: hidden; margin-top: 1.4vmin; }
+  .tline i { display: block; height: 100%; width: 100%; background: var(--gold); transform-origin: left; }
+  .stage { position: relative; }
   .lobby { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 5vmin; align-items: center; min-height: 0; }
   .qrcard { background: #fff; color: #1a1033; border-radius: 28px; padding: 2.4vmin; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
   .qrcard svg { width: 42vmin; height: 42vmin; display: block; }
@@ -103,9 +108,10 @@
   .ed .acts .sp { flex: 1; }
   .toast { position: fixed; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
+<link rel="stylesheet" id="tc">
 </head>
 <body>
-<div class="bg"><i></i><i></i><i></i></div>
+<div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
 <div id="app">
   <div class="top">
     <div id="conn"><span class="dot connecting"></span>Підключення…</div>
@@ -191,7 +197,7 @@ let G = null;
 function newGame() {
   const p = parseQuiz(quizText());
   const code = Array.from(crypto.getRandomValues(new Uint8Array(5)), b => 'ABCDEFGHJKLMNPRSTUVWXYZ'[b % 23]).join('');
-  G = { room: code, broker: 0, title: p.quiz.title, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
+  G = { room: code, broker: 0, theme: (G && G.theme) || 'neon', title: p.quiz.title, qs: p.quiz.qs, players: {}, phase: 'lobby', qi: -1, qStart: 0, qEnd: 0, answers: {}, prevRank: {} };
   save();
 }
 function save() { ls.set(LS_GAME, JSON.stringify(G)); }
@@ -220,7 +226,7 @@ function startNet() {
 }
 function publish() {
   if (!net) return;
-  const s = { v: 1, ph: G.phase, title: G.title, n: G.qs.length, i: G.qi, pl: {}, ts: Date.now() };
+  const s = { v: 1, th: G.theme, ph: G.phase, title: G.title, n: G.qs.length, i: G.qi, pl: {}, ts: Date.now() };
   for (const id in G.players) s.pl[id] = G.players[id].name;
   const q = G.qs[G.qi];
   if (q && ['intro', 'question', 'reveal'].includes(G.phase)) s.q = { text: q.q, a: q.a, time: q.t };
@@ -307,15 +313,22 @@ function playerUrl() {
   return u.href;
 }
 function qrSvg(text) { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
-let tick = null;
+let tick = null, lastScreen = null, drawT = null;
 function render() {
+  const scrKey = G.phase + ':' + G.qi;
+  clearTimeout(drawT);
+  if (lastScreen !== null && lastScreen !== scrKey) { lastScreen = scrKey; VQ.wipe(); clearInterval(tick); drawT = setTimeout(draw, 380); return; }
+  lastScreen = scrKey; draw();
+}
+function draw() {
   clearInterval(tick); bottom.innerHTML = '';
   const ph = G.phase, q = G.qs[G.qi];
   if (ph === 'lobby') {
     const url = playerUrl(), n = Object.keys(G.players).length;
-    stage.innerHTML = `<div class="lobby">
+    const tk = Array(8).fill(`<span>${esc(G.title)}</span><span>★</span><span>Скануй QR</span><span>★</span><span>Код ${G.room}</span><span>★</span>`).join('');
+    stage.innerHTML = `<div class="ticker lob"><div class="track">${tk}</div></div><div class="lobby">
       <div class="qrcard pop">${qrSvg(url)}<div class="code">${G.room}</div><div class="url">${esc(url.replace(/^https?:\/\//, ''))}</div></div>
-      <div><h1 class="rise">${esc(G.title)}</h1>
+      <div><h1>${VQ.kin(G.title)}</h1>
         <div class="hint">Скануй QR-код камерою телефону і впиши своє ім'я</div>
         <div class="count" id="cnt"></div>
         <div class="names" id="names"></div>
@@ -323,8 +336,13 @@ function render() {
     lobbyNames();
     bottom.innerHTML = `<button class="btn" id="bStart">▶ Почати квіз</button>
       <button class="btn ghost" id="bEdit">✎ Питання (${G.qs.length})</button>
+      <button class="btn ghost" id="bTheme">🎨 ${VQ.THEMES[G.theme].name}</button>
       <button class="btn ghost" id="bNew">↺ Нова гра</button>`;
     $('#bStart').onclick = next;
+    $('#bTheme').onclick = () => {
+      const ks = Object.keys(VQ.THEMES); G.theme = ks[(ks.indexOf(G.theme) + 1) % ks.length];
+      VQ.applyTheme(G.theme); save(); publish(); VQ.wipe(); $('#bTheme').textContent = '🎨 ' + VQ.THEMES[G.theme].name;
+    };
     $('#bEdit').onclick = openEditor;
     $('#bNew').onclick = () => { if (confirm('Почати нову гру? Гравці і бали обнуляться, з\'явиться новий QR-код.')) { net && net.pub(base() + '/s', null, { retain: true }); newGame(); startNet(); render(); } };
     return;
@@ -332,15 +350,15 @@ function render() {
   if (ph === 'intro') {
     stage.innerHTML = `<div class="center intro"><div>
       <div class="num pop">Питання ${G.qi + 1} з ${G.qs.length}</div>
-      <div class="qt rise">${esc(q.q)}</div>
+      <div class="qt">${VQ.kin(q.q)}</div>
       <div class="introbar"><i style="animation-duration:${INTRO_MS}ms"></i></div></div></div>`;
     bottom.innerHTML = `<button class="btn ghost" id="bNext">Далі ›</button>`; $('#bNext').onclick = next;
     return;
   }
   if (ph === 'question' || ph === 'reveal') {
     const rev = ph === 'reveal', c = counts(), mx = Math.max(1, ...c);
-    stage.innerHTML = `<div class="qhead ${rev ? '' : 'pop'}">${esc(q.q)}</div>
-      <div class="qmid">${rev ? '<div></div>' : `<div class="timer" id="timer"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" stroke="rgba(255,255,255,.12)"/><circle id="tc" cx="50" cy="50" r="44" stroke="#ffd166" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg><div class="tn" id="tn">${q.t}</div></div>`}
+    stage.innerHTML = `<div class="bignum">${String(G.qi + 1).padStart(2, '0')}</div><div class="qhead ${rev ? '' : 'pop'}">${esc(q.q)}</div>${rev ? '' : '<div class="tline"><i id="tl"></i></div>'}
+      <div class="qmid">${rev ? '<div></div>' : `<div class="timer" id="timer"><svg viewBox="0 0 100 100"><circle class="ttrack" cx="50" cy="50" r="44" stroke="rgba(255,255,255,.12)"/><circle id="tcirc" class="tprog" cx="50" cy="50" r="44" stroke="var(--gold)" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0"/></svg><div class="tn" id="tn">${q.t}</div></div>`}
         ${rev ? `<div class="bars">${q.a.map((_, i) => `<div class="bar ${i === q.c ? '' : 'dim'}"><b>${c[i]}</b><i class="ans${i}" data-h="${Math.max(4, c[i] / mx * 100)}"></i></div>`).join('')}</div>` : '<div></div>'}
         <div class="answered"><b id="ansN">${Object.keys(G.answers).length}</b><span>відповідей</span></div></div>
       <div class="grid">${q.a.map((a, i) => `<div class="opt ans${i} ${rev ? (i === q.c ? 'win' : 'dim') : 'rise'}" style="animation-delay:${i * 80}ms"><span class="letter">${LETTERS[i]}</span><span>${esc(a)}</span>${rev && i === q.c ? '<span class="mark pop">✓</span>' : ''}</div>`).join('')}</div>`;
@@ -352,7 +370,7 @@ function render() {
       let lastS = null;
       const upd = () => {
         const left = Math.max(0, G.qEnd - Date.now()), s = Math.ceil(left / 1000);
-        $('#tn').textContent = s; $('#tc').style.strokeDashoffset = 276.5 * (1 - left / (q.t * 1000));
+        $('#tn').textContent = s; $("#tcirc").style.strokeDashoffset = 276.5 * (1 - left / (q.t * 1000)); $('#tl').style.transform = `scaleX(${left / (q.t * 1000)})`;
         if (s !== lastS) { lastS = s; if (s <= 5 && s > 0) { $('#timer').classList.add('low'); Sfx.tick(s <= 3); Sfx.tempo = 1.25; } }
         if (left <= 0) endQuestion();
       };
@@ -363,7 +381,7 @@ function render() {
   }
   if (ph === 'board') {
     const rk = ranking().slice(0, 5);
-    stage.innerHTML = `<div class="board"><h2 class="pop">Таблиця лідерів</h2><div class="rows">${rk.map((p, i) => {
+    stage.innerHTML = `<div class="board"><h2>${VQ.kin('Таблиця лідерів')}</h2><div class="rows">${rk.map((p, i) => {
       const up = (G.prevRank[p.id] || 99) - p.rank;
       return `<div class="row rise" style="animation-delay:${i * 120}ms"><span class="pl">${p.rank}</span><span class="nm">${esc(p.name)}</span>${up > 0 && G.qi > 0 ? `<span class="up">▲${up}</span>` : ''}<span class="sc" data-v="${p.score}">0</span></div>`;
     }).join('') || '<div class="row">Поки що нікого</div>'}</div></div>`;
@@ -373,7 +391,7 @@ function render() {
   }
   if (ph === 'final') {
     const rk = ranking(), top = [rk[1], rk[0], rk[2]];
-    stage.innerHTML = `<div class="finaltitle pop">${esc(G.title)}: переможці</div><div class="podium">${top.map((p, k) => {
+    stage.innerHTML = `<div class="finaltitle">${VQ.kin('Переможці')}</div><div class="podium">${top.map((p, k) => {
       const pl = [2, 1, 3][k];
       return `<div class="col p${pl}" id="col${pl}"><div class="who">${pl === 1 ? '<div class="crown">👑</div>' : ''}<div class="nm">${p ? esc(p.name) : '—'}</div><div class="sc">${p ? p.score + ' балів' : ''}</div></div><div class="block">${pl}</div></div>`;
     }).join('')}</div>`;
@@ -446,6 +464,8 @@ document.addEventListener('keydown', e => {
 });
 
 /* Якщо сторінку перезавантажили посеред гри: продовжуємо */
+if (VQ.params.get('theme')) { G.theme = VQ.params.get('theme'); save(); }
+G.theme = VQ.applyTheme(G.theme);
 startNet();
 render();
 if (G.phase === 'intro') { clearTimeout(tmr); tmr = setTimeout(() => { if (G.phase === 'intro') startQuestion(); }, Math.max(300, G.qStart - Date.now())); }

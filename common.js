@@ -181,5 +181,46 @@ const VQ = (() => {
     })(t0);
   }
 
-  return { connect, Sfx, confetti, rid, esc, topic, params, BROKERS };
+  /* ---------- Стилі ---------- */
+  const THEMES = {
+    glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
+    edit: { name: 'Журнал', fonts: 'Inter+Tight:ital,wght@0,500;0,700;0,800;0,900;1,900&family=Cormorant+Garamond:ital,wght@1,500;1,600' },
+    live: { name: 'Трансляція', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900' },
+    neon: { name: 'Неон-шоу', fonts: 'Unbounded:wght@500;700;900&family=Manrope:wght@500;700;800' },
+    gold: { name: 'Чорне золото', fonts: 'Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Manrope:wght@500;700;800' },
+    pop: { name: 'Поп-арт', fonts: 'Dela+Gothic+One&family=Manrope:wght@500;700;800' }
+  };
+  function applyTheme(t) {
+    if (!THEMES[t]) t = 'neon';
+    if (document.body.dataset.theme === t) return t;
+    document.body.dataset.theme = t;
+    document.getElementById('tf').href = 'https://fonts.googleapis.com/css2?family=' + THEMES[t].fonts + '&display=swap';
+    document.getElementById('tc').href = 'theme-' + t + '.css';
+    const bg = document.querySelector('.bg');
+    bg && bg.querySelectorAll('.bubbles').forEach(e => e.remove());
+    if (bg && t === 'glass') {
+      const b = document.createElement('div'); b.className = 'bubbles';
+      for (let k = 0; k < 18; k++) {
+        const sz = 14 + Math.random() * 90, sp = document.createElement('span');
+        sp.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random() * 100}%;animation-duration:${14 + Math.random() * 18}s,${3 + Math.random() * 3}s;animation-delay:${-Math.random() * 30}s,${-Math.random() * 3}s`;
+        b.appendChild(sp);
+      }
+      bg.appendChild(b);
+    }
+    return t;
+  }
+  /* Кінетичний текст: кожна літера вилітає окремо */
+  function kin(text, cls = '') {
+    let i = 0;
+    return `<span class="kin ${cls}">` + String(text ?? '').split(/(\s+)/).map(w => /^\s+$/.test(w) ? ' ' :
+      `<span class="w">${[...w].map(ch => `<span class="c" style="--i:${i++}">${esc(ch)}</span>`).join('')}</span>`).join('') + '</span>';
+  }
+  /* Перехід між екранами */
+  function wipe() {
+    let w = document.getElementById('wipe');
+    if (!w) { w = document.createElement('div'); w.id = 'wipe'; w.innerHTML = '<i></i><i></i><i></i>'; document.body.appendChild(w); }
+    w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
+  }
+
+  return { connect, Sfx, confetti, rid, esc, topic, params, BROKERS, THEMES, applyTheme, kin, wipe };
 })();

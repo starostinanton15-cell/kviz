@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
   #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
@@ -43,9 +43,10 @@
   .medal { font-size: 110px; line-height: 1; }
   .warn { color: var(--gold); font-size: 15px; }
 </style>
+<link rel="stylesheet" id="tc">
 </head>
 <body>
-<div class="bg"><i></i><i></i><i></i></div>
+<div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
 <div id="app">
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
@@ -58,6 +59,7 @@ const LETTERS = ['A', 'Б', 'В', 'Г'];
 const scr = document.getElementById('scr');
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 const room = (params.get('r') || '').toUpperCase().replace(/[^A-Z]/g, '');
+VQ.applyTheme(params.get('theme') || ls.get('vq_theme') || 'neon');
 let myId = ls.get('vq_id'); if (!myId) { myId = VQ.rid(14); ls.set('vq_id', myId); }
 let myName = ls.get('vq_name') || '';
 const JK = 'vq_joined_' + room;
@@ -95,6 +97,7 @@ function sendAns(i, a) { net && net.pub(VQ.topic(room) + '/p', { t: 'ans', id: m
 function onState(m) {
   if (!m) { if (S) { S = null; scr.innerHTML = `<div class="big">👋</div><h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
   const first = !S; S = m;
+  if (S.th && S.th !== document.body.dataset.theme) { VQ.applyTheme(S.th); ls.set('vq_theme', S.th); }
   if (joined && S.pl[myId]) confirmed = true;
   if (joined && confirmed && !S.pl[myId]) { joined = false; confirmed = false; ls.del(JK); }
   if (joined && !S.pl[myId] && first) sendJoin();
@@ -116,13 +119,13 @@ function show() {
   shownKey = key; clearInterval(tbar);
   const ph = S.ph, n = Object.keys(S.pl).length;
   if (ph === 'lobby') {
-    scr.innerHTML = `<div class="big pop">🎉</div><h1 class="rise">Ти в грі!</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
+    scr.innerHTML = `<div class="big pop">🎉</div><h1>${VQ.kin('Ти в грі!')}</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
       <button class="btn ghost" id="rename" style="margin-top:20px">Змінити ім'я</button>`;
     document.getElementById('rename').onclick = () => { joined = false; ls.del(JK); renderJoin(); };
     return;
   }
   if (ph === 'intro') {
-    scr.innerHTML = `<div class="sub">Питання ${S.i + 1} з ${S.n}</div><div class="big pop">⚡</div><h1 class="rise">Готуйся!</h1>`;
+    scr.innerHTML = `<div class="sub">Питання ${S.i + 1} з ${S.n}</div><div class="big pop">⚡</div><h1>${VQ.kin('Готуйся!')}</h1>`;
     vib(60); return;
   }
   if (ph === 'question') {
@@ -155,7 +158,7 @@ function show() {
     else if (ok === 0) { Sfx.init(); Sfx.wrong(); vib(300); }
     scr.innerHTML = `<div class="result ${ok === 1 ? 'ok' : ok === 0 ? 'bad' : 'none'} pop ${ok === 0 ? 'shake' : ''}">
       <div class="big">${ok === 1 ? '🎉' : ok === 0 ? '😬' : '🙈'}</div>
-      <h2>${ok === 1 ? 'Правильно!' : ok === 0 ? 'Мимо' : 'Не встиг'}</h2>
+      <h2>${VQ.kin(ok === 1 ? 'Правильно!' : ok === 0 ? 'Мимо' : 'Не встиг')}</h2>
       ${ok === 1 ? `<div class="gain">+${gain}</div>` : `<div class="sub" style="color:#fff">Правильна відповідь:<br><b>${esc(cor)}</b></div>`}
     </div><div class="place rise">Ти на <b>${rank}</b> місці</div>`;
     return;
@@ -179,7 +182,7 @@ function show() {
 
 function renderJoin() {
   shownKey = 'join';
-  scr.innerHTML = `<div class="big pop">👋</div><h1 class="rise">${esc((S && S.title) || 'Квіз')}</h1><div class="sub">Як тебе звати?</div>
+  scr.innerHTML = `<div class="big pop">👋</div><h1>${VQ.kin((S && S.title) || 'Квіз')}</h1><div class="sub">Як тебе звати?</div>
     <input id="nm" maxlength="20" autocomplete="off" placeholder="Твоє ім'я" value="${esc(myName)}">
     <button class="btn" id="go">Увійти в гру</button><div class="warn" id="w"></div>`;
   const nm = document.getElementById('nm');
