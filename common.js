@@ -215,6 +215,10 @@ const VQ = (() => {
       const phone = !document.getElementById('stage');
       if (t === 'glass') LQ.start({ scale: phone ? .4 : .55, count: phone ? 6 : 9 }); else LQ.stop();
     }
+    if (window.NF) {
+      const phone = !document.getElementById('stage');
+      if (t === 'nerd') NF.start({ scale: phone ? .7 : .6, small: phone }); else NF.stop();
+    }
     if (window.DD) {
       const phone = !document.getElementById('stage');
       if (t === 'city' || t === 'party') DD.start({ scale: phone ? .7 : .6, small: phone, mode: t }); else DD.stop();

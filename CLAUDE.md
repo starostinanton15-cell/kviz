@@ -32,6 +32,6 @@
 
 ## Три стилі за рефами Антона (2026-11-21, пілоти, не за замовчуванням)
 - `city` «Ігрове місто» (реф Paris Games Week): іграшкові блоки з товстим контуром і боковою гранню, п'єдестал-будиночки; фон: ізометричні кубики й монетки (doodle.js, mode city). Rubik.
-- `nerd` «Нердактик» (реф Nerdactic): темний сливовий UI, #8A4EE9 + #FF2AAC, Fira Sans Extra Condensed + Montserrat, неонові смуги на фоні (CSS).
+- `nerd` «Нердактик» (реф Nerdactic): темний сливовий UI, #8A4EE9 + #FF2AAC, Fira Sans Extra Condensed + Montserrat, живий фон `nerdfx.js` (NF.start/stop/pulse): неонові хвилі-сітки тягнуться до курсора + мерехтливий пил; сплеск на правильній відповіді, переможці й вході гостя.
 - `party` «Паті-постер» (реф Party People): синій постер, усе білим маркером від руки (криві рамки через border-radius), Neucha + Caveat, каракулі з «киплячою» лінією (doodle.js, mode party), ковпак на фото героя.
 Відкрити: host.html?theme=city|nerd|party. Behance/Pinterest з хмари не відкриваються: просити скріни/відео.
