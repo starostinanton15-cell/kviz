@@ -183,7 +183,9 @@ const VQ = (() => {
 
   /* ---------- Стилі ---------- */
   const THEMES = {
-    doodle: { name: 'Ігровий дудл', fonts: 'Rubik:wght@500;700;800;900&family=Caveat:wght@600;700' },
+    city: { name: 'Ігрове місто', fonts: 'Rubik:wght@500;700;800;900' },
+    nerd: { name: 'Нердактик', fonts: 'Fira+Sans+Extra+Condensed:ital,wght@0,700;0,800;0,900;1,800&family=Montserrat:wght@500;600;700;800' },
+    party: { name: 'Паті-постер', fonts: 'Neucha&family=Caveat:wght@600;700&family=Montserrat:wght@500;700;800' },
     show: { name: 'Скло-шоу', fonts: 'Exo+2:ital,wght@0,600;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@500;600;700;800' },
     glass: { name: 'Рідке скло', fonts: 'Inter:wght@400;500;600;700;800;900' },
     edit: { name: 'Журнал', fonts: 'Inter+Tight:ital,wght@0,500;0,700;0,800;0,900;1,900&family=Cormorant+Garamond:ital,wght@1,500;1,600' },
@@ -215,7 +217,7 @@ const VQ = (() => {
     }
     if (window.DD) {
       const phone = !document.getElementById('stage');
-      if (t === 'doodle') DD.start({ scale: phone ? .7 : .6, small: phone }); else DD.stop();
+      if (t === 'city' || t === 'party') DD.start({ scale: phone ? .7 : .6, small: phone, mode: t }); else DD.stop();
     }
     if (window.ST) {
       const phone = !document.getElementById('stage');
