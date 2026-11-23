@@ -50,8 +50,8 @@ window.FX = (() => {
       tilt(opts);
     }
     if (ph === 'reveal') {
-      const win = q('.opt.win'), dim = q('.opt.dim'); prep(q('.opt, .qhead, .answered'));
-      tl.to(dim, { y: '+=36', rotation: () => R(-6, 6), opacity: .28, scale: .94, duration: 1.1, ease: 'bounce.out', stagger: .06 }, .1)
+      const win = q('.opt.win'), dim = q('.opt.dim'), pic = !!(root.classList && root.classList.contains('haspic')); /* з фото лічильники мають лишатися читабельними */ prep(q('.opt, .qhead, .answered'));
+      tl.to(dim, { y: pic ? '+=8' : '+=36', rotation: () => R(-6, 6) * (pic ? .3 : 1), opacity: pic ? .82 : .28, scale: .94, duration: 1.1, ease: 'bounce.out', stagger: .06 }, .1)
         .fromTo(win, { scale: 1 }, { scale: 1.07, duration: 1, ease: 'elastic.out(1,.3)' }, .15)
         .from(q('.bar i'), { scaleY: 0, transformOrigin: '50% 100%', duration: 1.2, ease: 'elastic.out(1,.5)', stagger: .07 }, .2)
         .from(q('.bar b'), { y: 30, opacity: 0, stagger: .07, duration: .6 }, .5);
