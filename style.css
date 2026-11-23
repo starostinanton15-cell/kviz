@@ -82,5 +82,5 @@ body.webgl[data-theme="show"] .bg::before { display: block; z-index: 1; opacity:
 .gs .opt, .gs .qhead, .gs .row, .gs .qrcard, .gs .timer, .gs .answered, .gs .tline, .gs .intro .num, .gs .result, .gs .ticker.lob, .gs .bubble, .gs .bar i, .gs .bar b, .gs .col .who { transition: scale .35s cubic-bezier(.3, 1.6, .5, 1), filter .4s, box-shadow .4s !important; }
 
 /* Персонажі гостей: легке живе погойдування від ніг */
-.av { display: inline-block; flex: none; object-fit: contain; transform-origin: 50% 100%; animation: avBob 2.6s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(70,40,140,.22)); }
-@keyframes avBob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5%) rotate(2deg) scaleY(1.02); } }
+.av { display: inline-block; flex: none; object-fit: cover; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1px rgba(140,110,220,.25), 0 6px 16px rgba(70,40,140,.22), inset 0 0 0 1px rgba(255,255,255,.5); background: #f3ecff; animation: avBob 3.2s ease-in-out infinite; }
+@keyframes avBob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6%) rotate(3deg); } }
