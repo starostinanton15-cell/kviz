@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795444183">
+<link rel="stylesheet" href="style.css?v=1795449610">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -138,6 +138,9 @@
   .pal i { display: block; height: 54px; border-radius: 11px; margin-bottom: 7px; }
   .pal.pink i { background: linear-gradient(135deg, #ffc1dc, #d5c6ff 55%, #bfe3ff); }
   .pal.blue i { background: linear-gradient(135deg, #8fbaff, #a9a6ff 55%, #9fe9fa); }
+  .pal.coral i { background: linear-gradient(135deg, #ffc2a8, #b3c7ff 55%, #ffe0b3); }
+  .pal.lemon i { background: linear-gradient(135deg, #fff0a3, #d1c2ff 55%, #ffd6bd); }
+  .pal.mint i { background: linear-gradient(135deg, #b8f2db, #ffbdb3 55%, #b8e5fa); }
   .pal.on { border-color: var(--gold); box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 18%, transparent); }
   .setup select { margin-top: 10px; width: 100%; border: 1.5px solid #e6e2f4; border-radius: 12px; padding: 8px 10px; font: inherit; background: #fff; color: #1d1b3a; }
   .sbtn { border: 0; background: #f1eefb; color: #1d1b3a; border-radius: 999px; padding: 9px 14px; font: 600 14px/1 inherit; cursor: pointer; }
@@ -249,16 +252,16 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795444183';
+window.VQ_V = '1795449610';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795444183">
+<link rel="stylesheet" href="pal-blue.css?v=1795449610">
 </head>
 <body>
-<script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
+<script>document.body.dataset.pal = /^(blue|coral|lemon|mint)$/.test(window.VQ_PAL0) ? window.VQ_PAL0 : 'pink';</script>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
 <div id="app">
   <div class="top">
@@ -293,7 +296,7 @@ window.VQ_V = '1795444183';
       </div>
       <div class="card">
         <h4>Кольори</h4>
-        <div class="pals"><button class="pal pink" data-pal="pink"><i></i>Для дівчинки</button><button class="pal blue" data-pal="blue"><i></i>Для хлопця</button></div>
+        <div class="pals"><button class="pal pink" data-pal="pink"><i></i>Для дівчинки</button><button class="pal blue" data-pal="blue"><i></i>Для хлопця</button><button class="pal coral" data-pal="coral"><i></i>Корал і волошка</button><button class="pal lemon" data-pal="lemon"><i></i>Лимон і бузок</button><button class="pal mint" data-pal="mint"><i></i>М'ята і корал</button></div>
         <select id="sTheme" title="Стиль оформлення"></select>
         <select id="sLobby" title="Музика на першому екрані"><option value="old">Заставка: стара</option><option value="B">Заставка: фонк (згенерований)</option><option value="own">Заставка: свій трек</option></select>
         <div class="btns"><button class="sbtn" id="sLobbyUp">🎵 Свій трек</button><button class="sbtn" id="sLobbyPlay">▶ Послухати</button></div>
@@ -357,18 +360,18 @@ window.VQ_V = '1795444183';
   </div>
 </div>
 
-<script>window.VQ_V = '1795444183'</script>
-<script src="lib/mqtt.min.js?v=1795444183"></script>
-<script src="lib/qrcode.js?v=1795444183"></script>
-<script src="common.js?v=1795444183"></script>
-<script src="lib/gsap.min.js?v=1795444183"></script>
-<script src="liquid.js?v=1795444183"></script>
-<script src="substance.js?v=1795444183"></script>
-<script src="sway.js?v=1795444183"></script>
-<script src="stagefx.js?v=1795444183"></script>
-<script src="doodle.js?v=1795444183"></script>
-<script src="nerdfx.js?v=1795444183"></script>
-<script src="fx.js?v=1795444183"></script>
+<script>window.VQ_V = '1795449610'</script>
+<script src="lib/mqtt.min.js?v=1795449610"></script>
+<script src="lib/qrcode.js?v=1795449610"></script>
+<script src="common.js?v=1795449610"></script>
+<script src="lib/gsap.min.js?v=1795449610"></script>
+<script src="liquid.js?v=1795449610"></script>
+<script src="substance.js?v=1795449610"></script>
+<script src="sway.js?v=1795449610"></script>
+<script src="stagefx.js?v=1795449610"></script>
+<script src="doodle.js?v=1795449610"></script>
+<script src="nerdfx.js?v=1795449610"></script>
+<script src="fx.js?v=1795449610"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -376,7 +379,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795444183"></script>
+<script src="questions.js?v=1795449610"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';

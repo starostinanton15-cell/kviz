@@ -6,9 +6,16 @@ window.SB = (() => {
   let fps = 0, pa = 0, gl, cv, prog, raf = 0, uni = {}, t0 = performance.now(), scale = .5, running = false, boost = 0, mode = 'ink';
   const mouse = { x: .5, y: .5, tx: .5, ty: .5, on: 0, ton: 0 };
   const MODES = { silk: 0, pearl: 1, ink: 2 };
+  /* Палітри фарби понад рожеву/синю: фон, далі 4 кольори барвника */
+  const INKS = {
+    coral: [[1, .98, .95], [1, .76, .66], [.70, .78, 1], [1, .88, .70], [.82, .90, 1]],
+    lemon: [[1, .99, .95], [1, .94, .64], [.82, .76, 1], [1, .84, .74], [.80, .96, .88]],
+    mint: [[.98, 1, .98], [.72, .95, .86], [1, .74, .70], [1, .92, .78], [.72, .90, .98]],
+  };
+  let px = 0, ink = INKS.coral.map(c => c.slice());
   const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
   const FS = `precision highp float;
-uniform vec2 R; uniform float T; uniform float M; uniform vec3 MS; uniform float BO; uniform float PA;
+uniform vec2 R; uniform float T; uniform float M; uniform vec3 MS; uniform float BO; uniform float PA; uniform float PX; uniform vec3 C0; uniform vec3 C1; uniform vec3 C2; uniform vec3 C3; uniform vec3 C4;
 float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
 /* Клітинки шуму по модулю 289: інакше за кілька годин роботи сторінки (час росте) хеш втрачав точність —
    у фоні з'являлись трикутники-блоки й зайвий синій. Шум лишається безперервним. */
@@ -63,7 +70,9 @@ void main(){
     float f = fbm(q + 3.2*b);
     vec3 c1 = mix(vec3(1., .72, .84), vec3(.62, .78, 1.), PA), c2 = mix(vec3(.74, .80, 1.), vec3(.70, .70, 1.), PA),
          c3 = mix(vec3(1., .86, .70), vec3(.66, .93, 1.), PA), c4 = mix(vec3(.78, .96, .90), vec3(.80, .96, .94), PA);
-    col = mix(mix(vec3(.99,.97,1.), vec3(.96,.98,1.), PA), c1, smoothstep(.25, .75, f));
+    /* додаткові палітри (корал / лимон / м'ята): плавно підміняють кольори фарби */
+    c1 = mix(c1, C1, PX); c2 = mix(c2, C2, PX); c3 = mix(c3, C3, PX); c4 = mix(c4, C4, PX);
+    col = mix(mix(mix(vec3(.99,.97,1.), vec3(.96,.98,1.), PA), C0, PX), c1, smoothstep(.25, .75, f));
     col = mix(col, c2, smoothstep(.35, .9, length(a)*.9));
     col = mix(col, c3, smoothstep(.55, 1., b.x) * .8);
     col = mix(col, c4, smoothstep(.6, 1., b.y) * .6);
@@ -85,7 +94,7 @@ void main(){
     gl.useProgram(prog);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ['R', 'T', 'M', 'MS', 'BO', 'PA'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
+    ['R', 'T', 'M', 'MS', 'BO', 'PA', 'PX', 'C0', 'C1', 'C2', 'C3', 'C4'].forEach(k => uni[k] = gl.getUniformLocation(prog, k));
     addEventListener('pointermove', e => { mouse.tx = e.clientX / innerWidth; mouse.ty = 1 - e.clientY / innerHeight; mouse.ton = 1; }, { passive: true });
     addEventListener('pointerleave', () => { mouse.ton = 0; });
     addEventListener('resize', resize);
@@ -106,6 +115,9 @@ void main(){
     gl.uniform2f(uni.R, cv.width, cv.height); gl.uniform1f(uni.T, t); gl.uniform1f(uni.M, m);
     gl.uniform3f(uni.MS, .5, .5, boost * .6); /* без реакції на мишку — Антон попросив */ gl.uniform1f(uni.BO, boost);
     pa += ((document.body.dataset.pal === 'blue' ? 1 : 0) - pa) * Math.min(1, dt * 2); gl.uniform1f(uni.PA, pa);
+    const P = INKS[document.body.dataset.pal], k = Math.min(1, dt * 2);
+    px += ((P ? 1 : 0) - px) * k; if (P) ink.forEach((c, j) => c.forEach((v, n) => c[n] += (P[j][n] - v) * k));
+    gl.uniform1f(uni.PX, px); ['C0', 'C1', 'C2', 'C3', 'C4'].forEach((u, j) => gl.uniform3fv(uni[u], ink[j]));
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function frame(now) {
