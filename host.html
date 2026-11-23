@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795432729">
+<link rel="stylesheet" href="style.css?v=1795440682">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -148,6 +148,7 @@
   .qc-tools { display: flex; gap: 4px; flex: none; }
   .qc-tools button { width: 34px; height: 34px; border-radius: 10px; border: 0; background: #f1eefb; cursor: pointer; font-size: 15px; color: #1d1b3a; }
   .qc-tools button:hover { background: #e7e2fb; }
+  @media (max-width: 560px) { .qc-top { flex-wrap: wrap; } .qc-tools { margin-left: auto; } .qc-top > textarea, .qc-top > input { order: 2; flex: 1 1 100%; } .su-head { padding: 14px 16px 10px; } .su-body { padding: 0 12px; } }
   .qc-ans { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 0 50px; }
   .an { display: flex; align-items: center; gap: 8px; background: #f7f6fc; border-radius: 14px; padding: 5px 8px 5px 5px; border: 2px solid transparent; }
   .an .lt { flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: #fff; font-weight: 800; background: var(--c); }
@@ -174,7 +175,7 @@
   .addq { border: 2px dashed #cbc3ee; background: rgba(255,255,255,.55); border-radius: 22px; padding: 18px; font: 700 16px/1 inherit; cursor: pointer; color: var(--gold); flex: none; }
   .addq:hover { background: rgba(255,255,255,.85); }
   .su-hint { font-size: 13px; color: rgba(29,27,58,.55); line-height: 1.45; margin: 8px 0 0; }
-  @media (max-width: 900px) { .su-body { grid-template-columns: 1fr; overflow: auto; padding-bottom: 30px; } .su-side, .su-list { overflow: visible; padding-bottom: 0; } .qc-ans, .qc-bot, .qerr { margin-left: 0; } .qc-ans { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .su-body { display: block; overflow: auto; padding-bottom: 30px; } .su-side, .su-list { overflow: visible; min-height: auto; height: auto; padding-bottom: 0; } .su-side { margin-bottom: 14px; } .qc-ans, .qc-bot, .qerr { margin-left: 0; } .qc-ans { grid-template-columns: 1fr; } }
 
   /* Таблиця */
   .board h2 { font-size: 5.4vmin; text-align: center; margin: 1vmin 0 3vmin; font-weight: 900; }
@@ -240,13 +241,13 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795432729';
+window.VQ_V = '1795440682';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795432729">
+<link rel="stylesheet" href="pal-blue.css?v=1795440682">
 </head>
 <body>
 <script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
@@ -348,18 +349,18 @@ window.VQ_V = '1795432729';
   </div>
 </div>
 
-<script>window.VQ_V = '1795432729'</script>
-<script src="lib/mqtt.min.js?v=1795432729"></script>
-<script src="lib/qrcode.js?v=1795432729"></script>
-<script src="common.js?v=1795432729"></script>
-<script src="lib/gsap.min.js?v=1795432729"></script>
-<script src="liquid.js?v=1795432729"></script>
-<script src="substance.js?v=1795432729"></script>
-<script src="sway.js?v=1795432729"></script>
-<script src="stagefx.js?v=1795432729"></script>
-<script src="doodle.js?v=1795432729"></script>
-<script src="nerdfx.js?v=1795432729"></script>
-<script src="fx.js?v=1795432729"></script>
+<script>window.VQ_V = '1795440682'</script>
+<script src="lib/mqtt.min.js?v=1795440682"></script>
+<script src="lib/qrcode.js?v=1795440682"></script>
+<script src="common.js?v=1795440682"></script>
+<script src="lib/gsap.min.js?v=1795440682"></script>
+<script src="liquid.js?v=1795440682"></script>
+<script src="substance.js?v=1795440682"></script>
+<script src="sway.js?v=1795440682"></script>
+<script src="stagefx.js?v=1795440682"></script>
+<script src="doodle.js?v=1795440682"></script>
+<script src="nerdfx.js?v=1795440682"></script>
+<script src="fx.js?v=1795440682"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -367,7 +368,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795432729"></script>
+<script src="questions.js?v=1795440682"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
