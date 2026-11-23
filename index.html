@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795428004">
+<link rel="stylesheet" href="style.css?v=1795428247">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -43,8 +43,13 @@
   .medal { font-size: 110px; line-height: 1; }
   .warn { color: var(--gold); font-size: 15px; }
 </style>
-<link rel="stylesheet" id="tc">
-<link rel="stylesheet" href="pal-blue.css?v=1795428004">
+<script>/* Стиль одразу, до першого кадру */
+window.VQ_V = '1795428247';
+(function () { var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('vq_theme') || 'glass';
+  if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = localStorage.getItem('vq_pal') || 'pink';
+  document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
+</script>
+<link rel="stylesheet" href="pal-blue.css?v=1795428247">
 <style>
   /* Телефон: легше для слабких GPU (без розмиття під кнопками й вічних анімацій на кожній) */
   #scr .opt { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; animation: none; will-change: transform; }
@@ -66,22 +71,23 @@
 </style>
 </head>
 <body>
+<script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--a0,#ff6b8a)"/><stop offset=".55" style="stop-color:var(--gold,#8b6bff)"/><stop offset="1" style="stop-color:var(--a3,#22c9aa)"/></linearGradient></defs></svg>
 <div id="app">
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V = '1795428004'</script>
-<script src="lib/mqtt.min.js?v=1795428004"></script>
-<script src="common.js?v=1795428004"></script>
-<script src="lib/gsap.min.js?v=1795428004"></script>
-<script src="liquid.js?v=1795428004"></script>
-<script src="substance.js?v=1795428004"></script>
-<script src="stagefx.js?v=1795428004"></script>
-<script src="doodle.js?v=1795428004"></script>
-<script src="nerdfx.js?v=1795428004"></script>
-<script src="fx.js?v=1795428004"></script>
+<script>window.VQ_V = '1795428247'</script>
+<script src="lib/mqtt.min.js?v=1795428247"></script>
+<script src="common.js?v=1795428247"></script>
+<script src="lib/gsap.min.js?v=1795428247"></script>
+<script src="liquid.js?v=1795428247"></script>
+<script src="substance.js?v=1795428247"></script>
+<script src="stagefx.js?v=1795428247"></script>
+<script src="doodle.js?v=1795428247"></script>
+<script src="nerdfx.js?v=1795428247"></script>
+<script src="fx.js?v=1795428247"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {

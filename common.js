@@ -91,7 +91,7 @@ const VQ = (() => {
         this.out.connect(comp); comp.connect(this.ctx.destination);
         this.load();
       }
-      if (this.ctx.state === 'suspended') this.ctx.resume();
+      if (this.ctx.state === 'suspended') { const r = this.ctx.resume(); r && r.catch && r.catch(() => {}); }
     },
     setMuted(m) { this.muted = m; if (this.out) this.out.gain.value = m ? 0 : 0.55; },
     get t() { return this.ctx ? this.ctx.currentTime : 0; },
@@ -149,14 +149,13 @@ const VQ = (() => {
       const file = { lobby: 'lobby', think: 'think', board: 'board' }[kind];
       if (this.buf[file]) return this._track(file, this.t + .05, true);
       if (this.loading) { const my = kind; this.loading.then(() => { if (this.loopKind === my && this.buf[file] && !this.src) { clearInterval(this.loopTimer); this.loopTimer = null; this._track(file, this.t + .05, true); } }); }
-      this.loopTimer = setInterval(() => this._sched(), 25);
     },
     /* Відлік питання: таймер Антона (audio/timer.mp3, удар «час вийшов» на 30.05 с) + мелодія в C# мінорі 120 BPM = audio/q.mp3.
        Стартуємо з такого місця, щоб удар припав рівно на кінець часу. Довше 30 с: спершу крутимо середину 1.07–25.07 с. */
     countdown(left) {
       this.init(); if (!this.ctx) return;
       const b = this.buf.q;
-      if (!b) { this.loop('think'); if (this.loading && !this._cdWait) { this._cdWait = 1; const t0 = this.t, L = left; this.loading.then(() => { this._cdWait = 0; if (this.loopKind === 'think' && this.buf.q) this.countdown(L - (this.t - t0)); }); } return; }
+      if (!b) { this.stopLoop(); this.loopKind = 'cdwait'; const t0 = this.t, L = left; this.loading && this.loading.then(() => { if (this.loopKind === 'cdwait' && this.buf.q) this.countdown(L - (this.t - t0)); }); return; }
       this.stopLoop(); this.loopKind = 'count';
       if (!this.mgain) { this.mgain = this.ctx.createGain(); this.mgain.gain.value = .6; this.mgain.connect(this.out); }
       const HIT = 30.05, now = this.t + .05, mk = () => { const s = this.ctx.createBufferSource(), g = this.ctx.createGain(); s.buffer = b; s.connect(g); g.connect(this.out); (this.srcs = this.srcs || []).push({ s, g }); return [s, g]; };
