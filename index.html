@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795430742">
+<link rel="stylesheet" href="style.css?v=1795431381">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -44,12 +44,12 @@
   .warn { color: var(--gold); font-size: 15px; }
 </style>
 <script>/* Стиль одразу, до першого кадру */
-window.VQ_V = '1795430742';
+window.VQ_V = '1795431381';
 (function () { var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('vq_theme') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = localStorage.getItem('vq_pal') || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795430742">
+<link rel="stylesheet" href="pal-blue.css?v=1795431381">
 <style>
   /* Телефон: легше для слабких GPU (без розмиття під кнопками й вічних анімацій на кожній) */
   #scr .opt { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; animation: none; will-change: transform; }
@@ -84,16 +84,16 @@ window.VQ_V = '1795430742';
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V = '1795430742'</script>
-<script src="lib/mqtt.min.js?v=1795430742"></script>
-<script src="common.js?v=1795430742"></script>
-<script src="lib/gsap.min.js?v=1795430742"></script>
-<script src="liquid.js?v=1795430742"></script>
-<script src="substance.js?v=1795430742"></script>
-<script src="stagefx.js?v=1795430742"></script>
-<script src="doodle.js?v=1795430742"></script>
-<script src="nerdfx.js?v=1795430742"></script>
-<script src="fx.js?v=1795430742"></script>
+<script>window.VQ_V = '1795431381'</script>
+<script src="lib/mqtt.min.js?v=1795431381"></script>
+<script src="common.js?v=1795431381"></script>
+<script src="lib/gsap.min.js?v=1795431381"></script>
+<script src="liquid.js?v=1795431381"></script>
+<script src="substance.js?v=1795431381"></script>
+<script src="stagefx.js?v=1795431381"></script>
+<script src="doodle.js?v=1795431381"></script>
+<script src="nerdfx.js?v=1795431381"></script>
+<script src="fx.js?v=1795431381"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -159,6 +159,9 @@ if (!room) {
 /* Мій персонаж: випадковий при першому вході, гортається стрілками на екрані «Ти в грі!» */
 let myAv = +ls.get('vq_av') || (1 + Math.floor(Math.random() * VQ.AV_N)); if (myAv > VQ.AV_N) myAv = 1; ls.set('vq_av', myAv);
 function sendJoin() { net && net.pub(VQ.topic(room) + '/p', { t: 'join', id: myId, name: myName, av: myAv }); }
+/* Серцебиття для ведучого: поки сторінка відкрита, кожні 8 с «я тут» (з ім'ям, щоб повернутись після паузи) */
+setInterval(() => { if (joined && myName && !document.hidden) net && net.pub(VQ.topic(room) + '/p', { t: 'hb', id: myId, name: myName, av: myAv }); }, 8000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && joined && myName) { confirmed = false; sendJoin(); } });
 function sendAns(i, a) { net && net.pub(VQ.topic(room) + '/p', { t: 'ans', id: myId, q: i, a }); }
 
 function onState(m) {
