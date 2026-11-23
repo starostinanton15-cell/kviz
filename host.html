@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795430628">
+<link rel="stylesheet" href="style.css?v=1795430742">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -240,13 +240,13 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795430628';
+window.VQ_V = '1795430742';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795430628">
+<link rel="stylesheet" href="pal-blue.css?v=1795430742">
 </head>
 <body>
 <script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
@@ -348,18 +348,18 @@ window.VQ_V = '1795430628';
   </div>
 </div>
 
-<script>window.VQ_V = '1795430628'</script>
-<script src="lib/mqtt.min.js?v=1795430628"></script>
-<script src="lib/qrcode.js?v=1795430628"></script>
-<script src="common.js?v=1795430628"></script>
-<script src="lib/gsap.min.js?v=1795430628"></script>
-<script src="liquid.js?v=1795430628"></script>
-<script src="substance.js?v=1795430628"></script>
-<script src="sway.js?v=1795430628"></script>
-<script src="stagefx.js?v=1795430628"></script>
-<script src="doodle.js?v=1795430628"></script>
-<script src="nerdfx.js?v=1795430628"></script>
-<script src="fx.js?v=1795430628"></script>
+<script>window.VQ_V = '1795430742'</script>
+<script src="lib/mqtt.min.js?v=1795430742"></script>
+<script src="lib/qrcode.js?v=1795430742"></script>
+<script src="common.js?v=1795430742"></script>
+<script src="lib/gsap.min.js?v=1795430742"></script>
+<script src="liquid.js?v=1795430742"></script>
+<script src="substance.js?v=1795430742"></script>
+<script src="sway.js?v=1795430742"></script>
+<script src="stagefx.js?v=1795430742"></script>
+<script src="doodle.js?v=1795430742"></script>
+<script src="nerdfx.js?v=1795430742"></script>
+<script src="fx.js?v=1795430742"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -367,7 +367,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795430628"></script>
+<script src="questions.js?v=1795430742"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -647,7 +647,7 @@ function drawInner() {
     const rk = ranking().slice(0, 5);
     stage.innerHTML = `<div class="board"><h2>${VQ.kin('Таблиця лідерів')}</h2><div class="rows">${rk.map((p, i) => {
       const up = (G.prevRank[p.id] || 99) - p.rank;
-      return `<div class="row rise" data-prev="${G.prevRank[p.id] || 99}" data-old="${p.score - (G.qi >= 0 && G.answers[p.id] ? G.answers[p.id].pts : 0)}" style="animation-delay:${i * 120}ms"><span class="pl">${p.rank}</span><img class="av" src="${VQ.avSrc(G.players[p.id] && G.players[p.id].av)}" alt="" style="animation-delay:-${i * .45}s"><span class="nm">${esc(p.name)}</span>${up > 0 && G.qi > 0 ? `<span class="up">▲${up}</span>` : ''}${G.answers[p.id] && G.answers[p.id].pts ? `<span class="gain">+${G.answers[p.id].pts}</span>` : ''}<span class="sc" data-v="${p.score}">0</span></div>`;
+      return `<div class="row rise" data-prev="${G.prevRank[p.id] || 99}" data-old="${p.score - (G.qi >= 0 && G.answers[p.id] ? G.answers[p.id].pts : 0)}" style="animation-delay:${i * 120}ms"><span class="pl">${p.rank}</span><span class="nm">${esc(p.name)}</span>${up > 0 && G.qi > 0 ? `<span class="up">▲${up}</span>` : ''}${G.answers[p.id] && G.answers[p.id].pts ? `<span class="gain">+${G.answers[p.id].pts}</span>` : ''}<span class="sc" data-v="${p.score}">0</span></div>`;
     }).join('') || '<div class="row">Поки що нікого</div>'}</div></div>`;
     if (!(window.FX && FX.active())) countUp(); Sfx.stopLoop();
     bottom.innerHTML = `<button class="btn" id="bNext">Наступне питання ›</button>`; $('#bNext').onclick = next;
@@ -657,7 +657,7 @@ function drawInner() {
     const rk = ranking(), top = [rk[1], rk[0], rk[2]];
     stage.innerHTML = `<div class="finaltitle">${VQ.kin('Переможці')}</div><div class="podium">${top.map((p, k) => {
       const pl = [2, 1, 3][k];
-      return `<div class="col p${pl}" id="col${pl}"><div class="who">${pl === 1 ? '<div class="crown">👑</div>' : ''}${p ? `<img class="av big" src="${VQ.avSrc(G.players[p.id] && G.players[p.id].av)}" alt="">` : ''}<div class="nm">${p ? esc(p.name) : '—'}</div><div class="sc">${p ? p.score + ' балів' : ''}</div></div><div class="block">${pl}</div></div>`;
+      return `<div class="col p${pl}" id="col${pl}"><div class="who">${pl === 1 ? '<div class="crown">👑</div>' : ''}<div class="nm">${p ? esc(p.name) : '—'}</div><div class="sc">${p ? p.score + ' балів' : ''}</div></div><div class="block">${pl}</div></div>`;
     }).join('')}</div>`;
     const show = (n, d) => FT(() => { const c = $('#col' + n); if (!c || G.phase !== 'final') return; c.classList.add('show'); window.FX && FX.podium(n, stage); }, d);
     Sfx.drumroll(2); show(3, 2000); FT(() => Sfx.cymbal(), 2000);
@@ -700,7 +700,6 @@ function lobbyNames() {
   have.forEach((c, id) => { const P = G.players[id]; if (!P) return c.remove(); if (c.textContent !== P.name) { const im = c.querySelector('.av'); c.textContent = P.name; im && c.prepend(im); } const im = c.querySelector('.av'); if (im && c.dataset.av !== String(P.av)) { c.dataset.av = P.av; im.src = VQ.avSrc(P.av); } });
   for (const id in G.players) if (!have.has(id)) {
     const c = document.createElement('span'); c.className = 'chip pop'; c.dataset.id = id; c.title = 'Натисни, щоб прибрати'; c.textContent = G.players[id].name; c.dataset.av = G.players[id].av;
-    const im = document.createElement('img'); im.className = 'av'; im.alt = ''; im.src = VQ.avSrc(G.players[id].av); im.style.animationDelay = -Math.random() * 2.6 + 's'; c.prepend(im);
     c.onclick = () => { if (confirm('Прибрати «' + c.textContent + '» з гри?')) { delete G.players[id]; save(); lobbyNames(); publish(); } };
     box.appendChild(c);
   }
