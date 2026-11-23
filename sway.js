@@ -14,27 +14,31 @@ window.SW = (() => {
     ['.hero', .25, .15, 0],
     ['.stage > :not(.lobby):not(.ticker):not(.hero)', .6, .4, .2]
   ];
+  /* Списки елементів кешуємо й оновлюємо раз на ~0.5 с: querySelectorAll щокадру давав мікрофризи */
+  let cache = null, fr = 0;
+  const grab = () => { cache = LAYERS.map(L => [L, [...document.querySelectorAll(L[0])]]); cache.hero = [...document.querySelectorAll('.hero img.main')]; cache.hero.forEach(el => el.style.transformOrigin = '50% 100%'); [].concat(...cache.map(c => c[1])).forEach(el => el.style.willChange = 'translate, rotate'); };
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (document.hidden) return;
+    if (!cache || ++fr % 30 === 0) grab();
     const t = (now - t0) / 1000, w = 2 * Math.PI / 6.5;
     const cx = Math.sin(t * w) + .18 * Math.sin(t * w * 3 + 1);
     const cy = Math.sin(t * w * 2 + .6) * .8 + .1 * Math.sin(t * w * 5);
     const cr = Math.sin(t * w + .9);
-    for (const [sel, ax, ay, ar, sc] of LAYERS) {
-      document.querySelectorAll(sel).forEach(el => {
+    for (const [[sel, ax, ay, ar, sc], els] of cache) {
+      els.forEach(el => {
         el.style.translate = `${(cx * ax).toFixed(3)}vw ${(cy * ay).toFixed(3)}vh`;
         el.style.rotate = `${(cr * ar).toFixed(3)}deg`;
         if (sc) el.style.scale = String(sc + .03 * Math.sin(t * w * .5));
       });
     }
     // героїня гойдається від стоп, як людина в рефі
-    document.querySelectorAll('.hero img.main').forEach(el => { el.style.rotate = `${(Math.sin(t * w + 2.2) * .7).toFixed(3)}deg`; el.style.transformOrigin = '50% 100%'; });
+    cache.hero.forEach(el => { el.style.rotate = `${(Math.sin(t * w + 2.2) * .7).toFixed(3)}deg`; });
   }
   function clear() { [...LAYERS, ['.hero img.main']].forEach(([s]) => document.querySelectorAll(s).forEach(el => { el.style.translate = el.style.rotate = el.style.scale = ''; })); }
   return {
     start() { if (on) return; on = true; raf = requestAnimationFrame(frame); },
-    stop() { on = false; cancelAnimationFrame(raf); clear(); },
+    stop() { on = false; cancelAnimationFrame(raf); clear(); cache = null; },
     get on() { return on; }
   };
 })();

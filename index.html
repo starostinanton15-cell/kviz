@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#160d2e">
 <title>Квіз</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795429767">
+<link rel="stylesheet" href="style.css?v=1795430358">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: 17px; }
@@ -44,12 +44,12 @@
   .warn { color: var(--gold); font-size: 15px; }
 </style>
 <script>/* Стиль одразу, до першого кадру */
-window.VQ_V = '1795429767';
+window.VQ_V = '1795430358';
 (function () { var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('vq_theme') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = localStorage.getItem('vq_pal') || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795429767">
+<link rel="stylesheet" href="pal-blue.css?v=1795430358">
 <style>
   /* Телефон: легше для слабких GPU (без розмиття під кнопками й вічних анімацій на кожній) */
   #scr .opt { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; animation: none; will-change: transform; }
@@ -68,6 +68,12 @@ window.VQ_V = '1795429767';
   .ico.m2 { background: radial-gradient(circle at 32% 24%, #ffffff 0 10%, #e3e6f0 40%, #aab1c6 85%); text-shadow: 0 3px 10px rgba(40,50,90,.35); }
   .ico.m3 { background: radial-gradient(circle at 32% 24%, #fff1e6 0 10%, #f6b98d 40%, #d0804d 85%); }
   @keyframes icoFloat { 50% { translate: 0 -6px; } }
+  .avpick { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .avpick .av { width: 200px; height: 200px; }
+  .avpick .av.swap { animation: avIn .45s cubic-bezier(.3,1.6,.5,1), avBob 2.6s ease-in-out .45s infinite; }
+  @keyframes avIn { from { transform: scale(.6) rotate(-8deg); opacity: 0; } }
+  .avarr { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 28px; line-height: 1; font-weight: 700; }
+  .avhint { color: var(--muted); font-size: 13px; margin: 2px 0 6px; }
 </style>
 </head>
 <body>
@@ -78,16 +84,16 @@ window.VQ_V = '1795429767';
   <div class="top"><span class="me" id="me"><span class="dot connecting"></span></span><span class="pts" id="pts"></span></div>
   <div class="scr" id="scr"></div>
 </div>
-<script>window.VQ_V = '1795429767'</script>
-<script src="lib/mqtt.min.js?v=1795429767"></script>
-<script src="common.js?v=1795429767"></script>
-<script src="lib/gsap.min.js?v=1795429767"></script>
-<script src="liquid.js?v=1795429767"></script>
-<script src="substance.js?v=1795429767"></script>
-<script src="stagefx.js?v=1795429767"></script>
-<script src="doodle.js?v=1795429767"></script>
-<script src="nerdfx.js?v=1795429767"></script>
-<script src="fx.js?v=1795429767"></script>
+<script>window.VQ_V = '1795430358'</script>
+<script src="lib/mqtt.min.js?v=1795430358"></script>
+<script src="common.js?v=1795430358"></script>
+<script src="lib/gsap.min.js?v=1795430358"></script>
+<script src="liquid.js?v=1795430358"></script>
+<script src="substance.js?v=1795430358"></script>
+<script src="stagefx.js?v=1795430358"></script>
+<script src="doodle.js?v=1795430358"></script>
+<script src="nerdfx.js?v=1795430358"></script>
+<script src="fx.js?v=1795430358"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -150,7 +156,9 @@ if (!room) {
   });
   setTimeout(() => { if (!S) scr.innerHTML = `${ico('alert')}<h1>Гру не знайдено</h1><div class="sub">Перевір інтернет або відскануй QR-код ще раз</div><button class="btn ghost" onclick="location.reload()">Спробувати ще</button>`; }, 15000);
 }
-function sendJoin() { net && net.pub(VQ.topic(room) + '/p', { t: 'join', id: myId, name: myName }); }
+/* Мій персонаж: випадковий при першому вході, гортається стрілками на екрані «Ти в грі!» */
+let myAv = +ls.get('vq_av') || (1 + Math.floor(Math.random() * VQ.AV_N)); if (myAv > VQ.AV_N) myAv = 1; ls.set('vq_av', myAv);
+function sendJoin() { net && net.pub(VQ.topic(room) + '/p', { t: 'join', id: myId, name: myName, av: myAv }); }
 function sendAns(i, a) { net && net.pub(VQ.topic(room) + '/p', { t: 'ans', id: myId, q: i, a }); }
 
 function onState(m) {
@@ -179,8 +187,10 @@ function show() {
   shownKey = key; clearInterval(tbar);
   const ph = S.ph, n = Object.keys(S.pl).length;
   if (ph === 'lobby') {
-    scr.innerHTML = `${ico('check')}<h1>${VQ.kin('Ти в грі!')}</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
+    scr.innerHTML = `<div class="avpick"><button class="avarr" id="avP" aria-label="Попередній">‹</button><img class="av" id="myAv" src="${VQ.avSrc(myAv)}" alt=""><button class="avarr" id="avN" aria-label="Наступний">›</button></div><div class="avhint">Гортай, щоб обрати свого героя</div><h1>${VQ.kin('Ти в грі!')}</h1><div class="sub">Дивись на великий екран.<br>Квіз скоро почнеться.</div><div class="place">У грі: <b id="cnt">${n}</b></div>
       <button class="btn ghost" id="rename" style="margin-top:20px">Змінити ім'я</button>`;
+    const setAv = d => { myAv = (myAv - 1 + d + VQ.AV_N) % VQ.AV_N + 1; ls.set('vq_av', myAv); const im = document.getElementById('myAv'); im.src = VQ.avSrc(myAv); im.classList.remove('swap'); void im.offsetWidth; im.classList.add('swap'); sendJoin(); vib(15); };
+    document.getElementById('avP').onclick = () => setAv(-1); document.getElementById('avN').onclick = () => setAv(1);
     document.getElementById('rename').onclick = () => { joined = false; ls.del(JK); renderJoin(); };
     return;
   }

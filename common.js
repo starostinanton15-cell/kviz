@@ -185,7 +185,7 @@ const VQ = (() => {
       if (!this.mgain) { this.mgain = this.ctx.createGain(); this.mgain.gain.value = .6; this.mgain.connect(this.out); }
       s.connect(g); g.connect(this.mgain);
       const d = b.duration / s.playbackRate.value;
-      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(1, at + (first ? .6 : XF));
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(1, at + (first ? (n.startsWith('lobby') ? 6 : .6) : XF)); /* заставка заходить довгим фейдом */
       g.gain.setValueAtTime(1, at + d - XF); g.gain.linearRampToValueAtTime(0.0001, at + d);
       s.start(at); s.stop(at + d + .05);
       (this.srcs = this.srcs || []).push({ s, g }); this.src = s;
@@ -317,5 +317,7 @@ const VQ = (() => {
     w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
   }
 
-  return { connect, Sfx, confetti, rid, esc, topic, params, BROKERS, THEMES, applyTheme, kin, wipe };
+  /* Персонажі гостей: av/1.webp … av/N.webp (пробні 3, далі 70) */
+  const AV_N = 3, avSrc = n => 'av/' + (((+n || 1) - 1) % AV_N + 1) + '.webp?v=' + (window.VQ_V || '');
+  return { AV_N, avSrc, connect, Sfx, confetti, rid, esc, topic, params, BROKERS, THEMES, applyTheme, kin, wipe };
 })();

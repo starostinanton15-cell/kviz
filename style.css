@@ -80,3 +80,7 @@ body.webgl .bg .bubbles { opacity: .55; }
 .gs .opt, .gs .qhead, .gs .row, .gs .qrcard, .gs .timer, .gs .answered, .gs .tline, .gs .intro .num, .gs .result, .gs .ticker.lob { animation: none !important; }
 body.webgl[data-theme="show"] .bg::before { display: block; z-index: 1; opacity: .5; }
 .gs .opt, .gs .qhead, .gs .row, .gs .qrcard, .gs .timer, .gs .answered, .gs .tline, .gs .intro .num, .gs .result, .gs .ticker.lob, .gs .bubble, .gs .bar i, .gs .bar b, .gs .col .who { transition: scale .35s cubic-bezier(.3, 1.6, .5, 1), filter .4s, box-shadow .4s !important; }
+
+/* Персонажі гостей: легке живе погойдування від ніг */
+.av { display: inline-block; flex: none; object-fit: contain; transform-origin: 50% 100%; animation: avBob 2.6s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(70,40,140,.22)); }
+@keyframes avBob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5%) rotate(2deg) scaleY(1.02); } }
