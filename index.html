@@ -168,6 +168,7 @@ function onState(m) {
   if (!m) { if (S) { S = null; scr.innerHTML = `${ico('heart')}<h1>Гру завершено</h1><div class="sub">Дякуємо за участь!</div>`; } return; }
   const first = !S; S = m;
   if (S.th && S.th !== document.body.dataset.theme) { VQ.applyTheme(S.th); ls.set('vq_theme', S.th); }
+  if ((S.sb || '') !== (document.body.dataset.sub || '')) { if (S.sb) document.body.dataset.sub = S.sb; else delete document.body.dataset.sub; }
   if ((S.pa || 'pink') !== document.body.dataset.pal) { document.body.dataset.pal = S.pa || 'pink'; ls.set('vq_pal', document.body.dataset.pal); }
   if (joined && S.pl[myId]) confirmed = true;
   if (joined && confirmed && !S.pl[myId]) { joined = false; confirmed = false; ls.del(JK); }

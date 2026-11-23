@@ -297,6 +297,7 @@ window.VQ_V = '1795449610';
       <div class="card">
         <h4>Кольори</h4>
         <div class="pals"><button class="pal pink" data-pal="pink"><i></i>Для дівчинки</button><button class="pal blue" data-pal="blue"><i></i>Для хлопця</button><button class="pal coral" data-pal="coral"><i></i>Корал і волошка</button><button class="pal lemon" data-pal="lemon"><i></i>Лимон і бузок</button><button class="pal mint" data-pal="mint"><i></i>М'ята і корал</button></div>
+        <select id="sSub" title="Живий фон"><option value="">Фон: фарба у воді</option><option value="pearl">Фон: перламутр</option></select>
         <select id="sTheme" title="Стиль оформлення"></select>
         <select id="sLobby" title="Музика на першому екрані"><option value="old">Заставка: стара</option><option value="B">Заставка: фонк (згенерований)</option><option value="own">Заставка: свій трек</option></select>
         <div class="btns"><button class="sbtn" id="sLobbyUp">🎵 Свій трек</button><button class="sbtn" id="sLobbyPlay">▶ Послухати</button></div>
@@ -493,7 +494,7 @@ function startNet() {
 }
 function publish() {
   if (!net) return;
-  const s = { v: 1, th: G.theme, pa: G.pal || 'pink', ph: G.phase, title: G.title, n: G.qs.length, i: G.qi, pl: {}, ts: Date.now() };
+  const s = { v: 1, th: G.theme, pa: G.pal || 'pink', sb: ls.get('vq_sub') || '', ph: G.phase, title: G.title, n: G.qs.length, i: G.qi, pl: {}, ts: Date.now() };
   for (const id in G.players) s.pl[id] = G.players[id].name;
   const q = G.qs[G.qi];
   if (q && ['intro', 'question', 'reveal'].includes(G.phase)) s.q = { text: q.q, a: q.a, time: q.t };
@@ -927,6 +928,10 @@ document.querySelectorAll('.pal').forEach(b => b.onclick = () => {
 });
 /* Заставка лобі: вибір + свій трек (файл живе лише в цьому браузері, IndexedDB ключ 'lobby-own') */
 $('#sLobby').value = ls.get('vq_lobby') || 'old';
+/* Живий фон (substance.js): фарба у воді або перламутр; телефони беруть зі стану (sb) */
+const applySub = () => { const v = ls.get('vq_sub') || ''; if (v) document.body.dataset.sub = v; else delete document.body.dataset.sub; };
+$('#sSub').value = ls.get('vq_sub') || ''; applySub();
+$('#sSub').onchange = e => { ls.set('vq_sub', e.target.value); applySub(); publish(); };
 const lobbyRestart = () => { if (Sfx.loopKind === 'lobby') { Sfx.stopLoop(); setTimeout(() => Sfx.loop('lobby'), 600); } };
 $('#sLobby').onchange = e => { if (e.target.value === 'own' && !Sfx.buf.lobbyOwn) { toast('Спершу завантаж свій трек'); e.target.value = ls.get('vq_lobby') || 'old'; return; } ls.set('vq_lobby', e.target.value); lobbyRestart(); };
 $('#sLobbyUp').onclick = () => $('#fLobby').click();
