@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795428995">
+<link rel="stylesheet" href="style.css?v=1795429276">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -234,13 +234,13 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795428995';
+window.VQ_V = '1795429276';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795428995">
+<link rel="stylesheet" href="pal-blue.css?v=1795429276">
 </head>
 <body>
 <script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
@@ -280,6 +280,8 @@ window.VQ_V = '1795428995';
         <h4>Кольори</h4>
         <div class="pals"><button class="pal pink" data-pal="pink"><i></i>Для дівчинки</button><button class="pal blue" data-pal="blue"><i></i>Для хлопця</button></div>
         <select id="sTheme" title="Стиль оформлення"></select>
+        <select id="sLobby" title="Музика на першому екрані"><option value="old">Заставка: стара</option><option value="B">Заставка: фонк (згенерований)</option><option value="own">Заставка: свій трек</option></select>
+        <div class="btns"><button class="sbtn" id="sLobbyUp">🎵 Свій трек</button><button class="sbtn" id="sLobbyPlay">▶ Послухати</button></div>
         <select id="sSw" title="Звук переходу між екранами"><option value="2">Свуш 2: з мерехтінням</option><option value="3">Свуш 3: швидкий проліт</option><option value="old">Свуш: старий</option></select>
       </div>
       <div class="card">
@@ -302,6 +304,7 @@ window.VQ_V = '1795428995';
     <div class="su-list" id="suList"></div>
   </div>
   <input type="file" id="fHero" accept="image/*" hidden>
+  <input type="file" id="fLobby" accept="audio/*" hidden>
   <input type="file" id="fQImg" accept="image/*" hidden>
   <input type="file" id="fImport" accept=".json,.txt,application/json,text/plain" hidden>
 </div>
@@ -339,18 +342,18 @@ window.VQ_V = '1795428995';
   </div>
 </div>
 
-<script>window.VQ_V = '1795428995'</script>
-<script src="lib/mqtt.min.js?v=1795428995"></script>
-<script src="lib/qrcode.js?v=1795428995"></script>
-<script src="common.js?v=1795428995"></script>
-<script src="lib/gsap.min.js?v=1795428995"></script>
-<script src="liquid.js?v=1795428995"></script>
-<script src="substance.js?v=1795428995"></script>
-<script src="sway.js?v=1795428995"></script>
-<script src="stagefx.js?v=1795428995"></script>
-<script src="doodle.js?v=1795428995"></script>
-<script src="nerdfx.js?v=1795428995"></script>
-<script src="fx.js?v=1795428995"></script>
+<script>window.VQ_V = '1795429276'</script>
+<script src="lib/mqtt.min.js?v=1795429276"></script>
+<script src="lib/qrcode.js?v=1795429276"></script>
+<script src="common.js?v=1795429276"></script>
+<script src="lib/gsap.min.js?v=1795429276"></script>
+<script src="liquid.js?v=1795429276"></script>
+<script src="substance.js?v=1795429276"></script>
+<script src="sway.js?v=1795429276"></script>
+<script src="stagefx.js?v=1795429276"></script>
+<script src="doodle.js?v=1795429276"></script>
+<script src="nerdfx.js?v=1795429276"></script>
+<script src="fx.js?v=1795429276"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -358,7 +361,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795428995"></script>
+<script src="questions.js?v=1795429276"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -881,6 +884,19 @@ document.querySelectorAll('.pal').forEach(b => b.onclick = () => {
   Q.pal = G.pal = b.dataset.pal; if (G.theme !== 'glass') G.theme = VQ.applyTheme('glass');
   applyPal(); saveQuiz(); publish(); buildSetup();
 });
+/* Заставка лобі: вибір + свій трек (файл живе лише в цьому браузері, IndexedDB ключ 'lobby-own') */
+$('#sLobby').value = ls.get('vq_lobby') || 'old';
+const lobbyRestart = () => { if (Sfx.loopKind === 'lobby') { Sfx.stopLoop(); setTimeout(() => Sfx.loop('lobby'), 600); } };
+$('#sLobby').onchange = e => { if (e.target.value === 'own' && !Sfx.buf.lobbyOwn) { toast('Спершу завантаж свій трек'); e.target.value = ls.get('vq_lobby') || 'old'; return; } ls.set('vq_lobby', e.target.value); lobbyRestart(); };
+$('#sLobbyUp').onclick = () => $('#fLobby').click();
+$('#fLobby').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  toast('Завантажую трек…');
+  try { const ab = await f.arrayBuffer(); Sfx.init(); Sfx.buf.lobbyOwn = await new Promise((res, rej) => Sfx.ctx.decodeAudioData(ab.slice(0), res, rej)); await IDB.put('lobby-own', new Blob([ab], { type: f.type || 'audio/mpeg' }));
+    ls.set('vq_lobby', 'own'); $('#sLobby').value = 'own'; lobbyRestart(); toast('Свій трек на заставці'); }
+  catch (err) { toast('Не вдалося відкрити трек'); }
+};
+$('#sLobbyPlay').onpointerdown = e => { e.stopPropagation(); Sfx.init(); if (Sfx.loopKind === 'lobby') { Sfx.stopLoop(); $('#sLobbyPlay').textContent = '▶ Послухати'; } else { Sfx.loop('lobby'); $('#sLobbyPlay').textContent = '■ Стоп'; } };
 $('#sSw').value = Sfx.swoosh;
 $('#sSw').onchange = e => { ls.set('vq_sw', e.target.value); Sfx.whoosh(); };
 $('#sTheme').onchange = e => { const t = e.target.value; if (!t) return; G.theme = VQ.applyTheme(t); save(); publish(); buildSetup(); };
@@ -976,7 +992,7 @@ G.pal = G.pal || Q.pal;
 if (G.phase === 'lobby') { G.title = Q.title; G.greet = Q.greet; G.pal = Q.pal; G.qs = gameQs(); save(); }
 applyPal();
 startNet();
-IDB.all().then(m => { m.forEach((v, k) => IMGS.set(k, v)); render(); if (G.phase === 'lobby' && !VQ.params.get('guest')) openSetup(); wake(); });
+IDB.all().then(m => { const own = m.get('lobby-own'); m.delete('lobby-own'); if (own && own.arrayBuffer) own.arrayBuffer().then(ab => { Sfx.init(); Sfx.ctx.decodeAudioData(ab, b => { Sfx.buf.lobbyOwn = b; if (Sfx.loopKind === 'lobby' && ls.get('vq_lobby') === 'own') { Sfx.stopLoop(); Sfx.loop('lobby'); } }, () => {}); }); m.forEach((v, k) => IMGS.set(k, v)); render(); if (G.phase === 'lobby' && !VQ.params.get('guest')) openSetup(); wake(); });
 if (G.phase === 'intro') { clearTimeout(tmr); tmr = setTimeout(() => { if (G.phase === 'intro') startQuestion(); }, Math.max(300, G.qStart - Date.now())); }
 if (G.phase === 'final') Sfx.stopLoop();
 </script>

@@ -69,7 +69,7 @@ const VQ = (() => {
     set tempo(v) { this._tempo = v; if (this.src && this.loopKind !== 'count') this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
     load() {
       if (this.loading || !this.ctx) return this.loading;
-      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join', 'sw2', 'sw3'];
+      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join', 'sw2', 'sw3', 'lobbyB'];
       this.loading = Promise.all(names.map(n => fetch('audio/' + n + '.mp3?v=' + (window.VQ_V || ''))
         .then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((res, rej) => this.ctx.decodeAudioData(a, res, rej)))
         .then(b => { this.buf[n] = b; }).catch(() => {})));
@@ -148,7 +148,9 @@ const VQ = (() => {
       this.init(); if (!this.ctx) return;
       if (this.loopKind === kind) return;
       this.stopLoop(); this.loopKind = kind; this.step = 0; this.nextT = this.t + 0.08; this._tempo = 1;
-      const file = { lobby: 'lobby', think: 'think', board: 'board' }[kind];
+      /* Заставка лобі: localStorage vq_lobby = old | B (згенерований фонк) | own (свій трек, buf.lobbyOwn з IndexedDB) */
+      let file = { lobby: 'lobby', think: 'think', board: 'board' }[kind];
+      if (kind === 'lobby') { let v = 'old'; try { v = localStorage.getItem('vq_lobby') || 'old'; } catch (e) {} const alt = { B: 'lobbyB', own: 'lobbyOwn' }[v]; if (alt && this.buf[alt]) file = alt; }
       if (this.buf[file]) return this._track(file, this.t + .05, true);
       if (this.loading) { const my = kind; this.loading.then(() => { if (this.loopKind === my && this.buf[file] && !this.src) { clearInterval(this.loopTimer); this.loopTimer = null; this._track(file, this.t + .05, true); } }); }
     },
