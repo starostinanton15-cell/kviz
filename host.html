@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795427755">
+<link rel="stylesheet" href="style.css?v=1795428004">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
   #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: 3vmin 4vmin; }
   .top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-weight: 600; min-height: 2.4em; margin-bottom: 1.6vmin; position: relative; z-index: 3; }
   .top .tools { display: flex; gap: .6em; }
+  .top .tools button.ico { padding: .45em .75em; font-size: .95em; line-height: 1; }
+  #bRestart { display: none; } body.ingame #bRestart { display: inline-block; }
   .top .tools button { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .45em 1em; font-weight: 600; }
   .stage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .center { flex: 1; display: grid; place-items: center; text-align: center; }
@@ -232,7 +234,7 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <link rel="stylesheet" id="tc">
-<link rel="stylesheet" href="pal-blue.css?v=1795427755">
+<link rel="stylesheet" href="pal-blue.css?v=1795428004">
 </head>
 <body>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
@@ -240,6 +242,7 @@
   <div class="top">
     <div id="conn"><span class="dot connecting"></span>Підключення…</div>
     <div class="tools">
+      <button id="bRestart" class="ico" title="Квіз з початку (R, двічі)">↺</button>
       <button id="bSetup" title="Налаштування (S)">⚙ Налаштування</button>
       <button id="bSound" title="Звук (M)">🔊 Звук</button>
       <button id="bFull" title="На весь екран (F)">⛶ Екран</button>
@@ -328,18 +331,18 @@
   </div>
 </div>
 
-<script>window.VQ_V = '1795427755'</script>
-<script src="lib/mqtt.min.js?v=1795427755"></script>
-<script src="lib/qrcode.js?v=1795427755"></script>
-<script src="common.js?v=1795427755"></script>
-<script src="lib/gsap.min.js?v=1795427755"></script>
-<script src="liquid.js?v=1795427755"></script>
-<script src="substance.js?v=1795427755"></script>
-<script src="sway.js?v=1795427755"></script>
-<script src="stagefx.js?v=1795427755"></script>
-<script src="doodle.js?v=1795427755"></script>
-<script src="nerdfx.js?v=1795427755"></script>
-<script src="fx.js?v=1795427755"></script>
+<script>window.VQ_V = '1795428004'</script>
+<script src="lib/mqtt.min.js?v=1795428004"></script>
+<script src="lib/qrcode.js?v=1795428004"></script>
+<script src="common.js?v=1795428004"></script>
+<script src="lib/gsap.min.js?v=1795428004"></script>
+<script src="liquid.js?v=1795428004"></script>
+<script src="substance.js?v=1795428004"></script>
+<script src="sway.js?v=1795428004"></script>
+<script src="stagefx.js?v=1795428004"></script>
+<script src="doodle.js?v=1795428004"></script>
+<script src="nerdfx.js?v=1795428004"></script>
+<script src="fx.js?v=1795428004"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -347,7 +350,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795427755"></script>
+<script src="questions.js?v=1795428004"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -506,7 +509,10 @@ function uniq(name, id) {
 }
 
 /* ---------- Хід гри ---------- */
+/* Один натиск = один крок: повтори протягом 1.2 с ігноруються */
+let nextLock = 0;
 function next() {
+  const now = Date.now(); if (now < nextLock) return; nextLock = now + 1200;
   Sfx.init();
   if (G.phase === 'lobby') { if (!G.qs.length) return; G.qi = 0; return goIntro(); }
   if (G.phase === 'intro') return startQuestion();
@@ -536,6 +542,16 @@ function endQuestion() {
   G.phase = 'reveal'; save(); if (!Sfx.endCountdown(Date.now() >= G.qEnd - 250)) Sfx.gong();
   render(); publish();
 }
+/* ↺ Квіз з початку: ті самі гравці й QR, бали з нуля, знову перше питання в лобі */
+let rsArm = 0;
+function restartQuiz() {
+  if (Date.now() > rsArm) { rsArm = Date.now() + 2500; toast('Натисни ↺ ще раз: квіз з початку'); return; }
+  rsArm = 0; clearTimeout(tmr); Sfx.stopLoop();
+  for (const id in G.players) G.players[id].score = 0;
+  Object.assign(G, { phase: 'lobby', qi: -1, answers: {}, prevRank: {}, qStart: 0, qEnd: 0, title: Q.title, greet: Q.greet, pal: Q.pal, qs: gameQs() });
+  save(); render(); publish(); nextLock = Date.now() + 800; toast('Квіз з початку');
+}
+$('#bRestart').onclick = restartQuiz;
 function goFinal() { G.phase = 'final'; save(); Sfx.stopLoop(); render(); publish(); }
 
 /* ---------- Відображення ---------- */
@@ -547,6 +563,7 @@ function playerUrl() {
 function qrSvg(text) { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
 let tick = null, lastScreen = null, drawT = null;
 function render() {
+  document.body.classList.toggle('ingame', G.phase !== 'lobby');
   const scrKey = G.phase + ':' + G.qi;
   clearTimeout(drawT);
   if (lastScreen !== null && lastScreen !== scrKey) { lastScreen = scrKey; VQ.wipe(); clearInterval(tick); drawT = setTimeout(draw, 380); return; }
@@ -931,6 +948,8 @@ document.addEventListener('pointerdown', () => { Sfx.init(); if (G.phase === 'lo
 document.addEventListener('keydown', e => {
   if (isSetup() || $('#editor').classList.contains('on') || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (e.key === 's' || e.key === 'S' || e.key === 'і' || e.key === 'І' || e.key === 'ы') { openSetup(); return; }
+  if (e.repeat) return;
+  if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') { if (G.phase !== 'lobby') restartQuiz(); return; }
   if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); if (G.phase !== 'final') next(); }
   else if (e.key === 'm' || e.key === 'M' || e.key === 'ь' || e.key === 'Ь') $('#bSound').click();
   else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') $('#bFull').click();
