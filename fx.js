@@ -71,7 +71,8 @@ window.FX = (() => {
         const moved = old.some(o => o.k !== o.i && o.prev < 99), T1 = 1.0, T2 = moved ? 2.5 : 2.3, T3 = moved ? 3.5 : 2.4;
         tl.from(rows, { x: innerWidth * .7, skewX: -30, duration: .8, stagger: .07, ease: 'power4.out' })
           .add(() => {
-            snd('count', { vol: .55 });
+            /* звук рахування лише якщо хтось справді отримав бали */
+            if (rows.some(r => { const sc = r.querySelector('.sc'); return sc && +sc.dataset.v > (+r.dataset.old || 0); })) snd('count', { vol: .55 });
             rows.forEach(r => {
               const sc = r.querySelector('.sc'), o = { v: +r.dataset.old || 0 }, g = r.querySelector('.gain');
               if (g) gsap.fromTo(g, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: .5, ease: 'back.out(3)' });
@@ -86,6 +87,7 @@ window.FX = (() => {
           }, T2)
           .add(() => {
             const top = rows[0]; if (!top) return;
+            const lsc = top.querySelector('.sc'); if (!lsc || +lsc.dataset.v <= 0) return; /* нуль балів у всіх: без фанфар лідеру */
             snd('lead', { vol: .8 });
             let sh = top.querySelector('.sheen'); if (!sh) { sh = document.createElement('span'); sh.className = 'sheen'; sh.innerHTML = '<i></i>'; top.appendChild(sh); }
             gsap.fromTo(sh.firstChild, { xPercent: -130 }, { xPercent: 260, duration: .9, ease: 'power2.inOut' });

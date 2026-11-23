@@ -10,8 +10,10 @@ window.SB = (() => {
   const FS = `precision highp float;
 uniform vec2 R; uniform float T; uniform float M; uniform vec3 MS; uniform float BO; uniform float PA;
 float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
-float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
-  return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
+/* Клітинки шуму по модулю 289: інакше за кілька годин роботи сторінки (час росте) хеш втрачав точність —
+   у фоні з'являлись трикутники-блоки й зайвий синій. Шум лишається безперервним. */
+float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); vec2 j = mod(i, 289.), k = mod(i + 1., 289.);
+  return mix(mix(h21(j), h21(vec2(k.x, j.y)), f.x), mix(h21(vec2(j.x, k.y)), h21(k), f.x), f.y); }
 float fbm(vec2 p){ float s = 0., a = .5; mat2 r = mat2(.8,.6,-.6,.8); for (int i = 0; i < 5; i++){ s += a*n2(p); p = r*p*2.02 + 3.1; a *= .5; } return s; }
 vec3 pal(float t){ /* пастельний перламутр: рожевий → персик → бузок → блакить → м'ята */
   vec3 p = .78 + .22*cos(6.2831*(t + vec3(.0, .18, .38)));
