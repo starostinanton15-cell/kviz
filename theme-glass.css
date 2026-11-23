@@ -75,7 +75,8 @@ h1, h2, .qt, .finaltitle { font-weight: 800; letter-spacing: -.035em; line-heigh
 .qrcard svg { border-radius: 14px; }
 .qrcard .code { color: var(--ink); font-weight: 800; letter-spacing: .14em; }
 .lobby h1 { font-size: 7vmin; }
-.lobby h1 .c, .finaltitle .c, .board h2 .c { background: linear-gradient(180deg, #2a2360, #5b45c9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* Суцільний колір замість градієнта по кожній букві: background-clip:text на окремих буквах під покачуванням камери давав тонкі лінії між буквами */
+.lobby h1 .c, .finaltitle .c, .board h2 .c { color: #3f30a0; }
 .lobby .hint { color: var(--muted); }
 .count b, .answered b, .row .sc, .timer .tn, .place b, .col .who .sc { background: var(--iri); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .count b { font-weight: 900; }
@@ -135,7 +136,7 @@ h1, h2, .qt, .finaltitle { font-weight: 800; letter-spacing: -.035em; line-heigh
 
 /* Телефон */
 #scr h1 { font-size: 34px; }
-#scr h1 .c { background: linear-gradient(180deg, #2a2360, #5b45c9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#scr h1 .c { color: #3f30a0; }
 .sub { color: var(--muted) !important; }
 .top .me { color: var(--ink) !important; }
 input { border-radius: 22px; font-weight: 700; color: var(--ink); }

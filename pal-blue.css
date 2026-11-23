@@ -8,7 +8,7 @@ body[data-pal="blue"] {
   background: #eef5ff;
 }
 body[data-pal="blue"] .bg { background: linear-gradient(135deg, #eef6ff 0%, #e9efff 45%, #e8fbff 100%); }
-body[data-pal="blue"] .lobby h1 .c, body[data-pal="blue"] .finaltitle .c, body[data-pal="blue"] .board h2 .c, body[data-pal="blue"] #scr h1 .c { background: linear-gradient(180deg, #102a6b, #2f6bff); -webkit-background-clip: text; background-clip: text; }
+body[data-pal="blue"] .lobby h1 .c, body[data-pal="blue"] .finaltitle .c, body[data-pal="blue"] .board h2 .c, body[data-pal="blue"] #scr h1 .c { color: #1f45b8; }
 body[data-pal="blue"] .btn:not(.ghost) { background: linear-gradient(140deg, rgba(70,130,255,.9), rgba(40,190,230,.75)); text-shadow: 0 1px 2px rgba(20,50,140,.3); }
 body[data-pal="blue"] .qrcard::after, body[data-pal="blue"] .btn::after, body[data-pal="blue"] .qhead::after, body[data-pal="blue"] .opt::after, body[data-pal="blue"] .row::after, body[data-pal="blue"] .col .block::after, body[data-pal="blue"] .result::after, body[data-pal="blue"] .timer::after {
   background: conic-gradient(from var(--ang), rgba(90,150,255,.95), rgba(255,255,255,.2) 18%, rgba(90,220,255,.95) 35%, rgba(255,255,255,.2) 52%, rgba(120,120,255,.95) 68%, rgba(255,255,255,.2) 84%, rgba(90,150,255,.95)); }
