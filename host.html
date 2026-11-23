@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795429495">
+<link rel="stylesheet" href="style.css?v=1795429767">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -76,6 +76,7 @@
   .qinfo { display: none; }
   .qmid .timer { grid-column: 1; grid-row: 1; } .qmid .bars { grid-column: 2; grid-row: 1; } .qmid .answered { grid-column: 3; grid-row: 1; }
   .row .gain { display: none; }
+  body[data-theme="glass"] .row .gain { display: inline-block; font-size: .62em; font-weight: 900; color: #fff; background: linear-gradient(135deg, var(--a1, #8a6cff), var(--a0, #ff5d9e)); padding: .2em .6em; border-radius: 999px; box-shadow: 0 4px 14px rgba(120,80,200,.3); }
   .answered b { display: block; font-size: 9vmin; font-weight: 900; line-height: 1; }
   .answered span { color: var(--muted); font-size: 2.4vmin; font-weight: 600; }
   .bars { display: flex; gap: 3vmin; align-items: flex-end; height: 26vmin; }
@@ -184,7 +185,9 @@
   .row:nth-child(2) .pl { background: #d9dde6; color: #2a1640; }
   .row:nth-child(3) .pl { background: #e0965a; color: #2a1640; }
   .row .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .row .sc { color: var(--gold); }
+  .row .sc { color: var(--gold); display: inline-block; }
+  .row > .sheen { position: absolute !important; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 3; }
+  .row > .sheen i { position: absolute; top: -20%; bottom: -20%; left: 0; width: 40%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.85), transparent); transform: translateX(-130%) skewX(-18deg); }
   .row .up { color: var(--ok); font-size: .7em; }
 
   /* П'єдестал */
@@ -234,13 +237,13 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795429495';
+window.VQ_V = '1795429767';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795429495">
+<link rel="stylesheet" href="pal-blue.css?v=1795429767">
 </head>
 <body>
 <script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
@@ -342,18 +345,18 @@ window.VQ_V = '1795429495';
   </div>
 </div>
 
-<script>window.VQ_V = '1795429495'</script>
-<script src="lib/mqtt.min.js?v=1795429495"></script>
-<script src="lib/qrcode.js?v=1795429495"></script>
-<script src="common.js?v=1795429495"></script>
-<script src="lib/gsap.min.js?v=1795429495"></script>
-<script src="liquid.js?v=1795429495"></script>
-<script src="substance.js?v=1795429495"></script>
-<script src="sway.js?v=1795429495"></script>
-<script src="stagefx.js?v=1795429495"></script>
-<script src="doodle.js?v=1795429495"></script>
-<script src="nerdfx.js?v=1795429495"></script>
-<script src="fx.js?v=1795429495"></script>
+<script>window.VQ_V = '1795429767'</script>
+<script src="lib/mqtt.min.js?v=1795429767"></script>
+<script src="lib/qrcode.js?v=1795429767"></script>
+<script src="common.js?v=1795429767"></script>
+<script src="lib/gsap.min.js?v=1795429767"></script>
+<script src="liquid.js?v=1795429767"></script>
+<script src="substance.js?v=1795429767"></script>
+<script src="sway.js?v=1795429767"></script>
+<script src="stagefx.js?v=1795429767"></script>
+<script src="doodle.js?v=1795429767"></script>
+<script src="nerdfx.js?v=1795429767"></script>
+<script src="fx.js?v=1795429767"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -361,7 +364,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795429495"></script>
+<script src="questions.js?v=1795429767"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';

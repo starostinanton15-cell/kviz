@@ -69,7 +69,7 @@ const VQ = (() => {
     set tempo(v) { this._tempo = v; if (this.src && this.loopKind !== 'count') this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
     load() {
       if (this.loading || !this.ctx) return this.loading;
-      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join', 'sw2', 'sw3', 'lobbyB'];
+      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join', 'sw2', 'sw3', 'lobbyB', 'count', 'pass', 'lead'];
       this.loading = Promise.all(names.map(n => fetch('audio/' + n + '.mp3?v=' + (window.VQ_V || ''))
         .then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((res, rej) => this.ctx.decodeAudioData(a, res, rej)))
         .then(b => { this.buf[n] = b; }).catch(() => {})));

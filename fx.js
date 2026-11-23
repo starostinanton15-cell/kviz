@@ -66,15 +66,33 @@ window.FX = (() => {
         old.forEach((o, k) => { o.k = o.prev >= 99 ? rows.length + 1 : k; });
         rows.forEach(r => { const sc = r.querySelector('.sc'); if (sc) sc.textContent = r.dataset.old; });
         old.forEach(o => gsap.set(o.r, { y: (o.k - o.i) * step, opacity: o.prev >= 99 ? 0 : 1 }));
+        /* 1) рядки влітають зі старими балами; 2) +бали і лічильник (звук count); 3) обгін (звук pass); 4) спалах лідера (звук lead) */
+        const S = typeof VQ !== 'undefined' && VQ.Sfx, snd = (n, o) => S && S.buf && S.buf[n] && S.play(n, o);
+        const moved = old.some(o => o.k !== o.i && o.prev < 99), T1 = 1.0, T2 = moved ? 2.5 : 2.3, T3 = moved ? 3.5 : 2.4;
         tl.from(rows, { x: innerWidth * .7, skewX: -30, duration: .8, stagger: .07, ease: 'power4.out' })
-          .to(rows, { y: 0, opacity: 1, duration: 1.1, ease: 'power3.inOut', stagger: .04 }, 1.3)
           .add(() => {
+            snd('count', { vol: .55 });
             rows.forEach(r => {
-              const sc = r.querySelector('.sc'), o = { v: +r.dataset.old || 0 };
-              if (sc) gsap.to(o, { v: +sc.dataset.v, duration: 1, ease: 'power2.out', onUpdate: () => sc.textContent = Math.round(o.v) });
+              const sc = r.querySelector('.sc'), o = { v: +r.dataset.old || 0 }, g = r.querySelector('.gain');
+              if (g) gsap.fromTo(g, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: .5, ease: 'back.out(3)' });
+              if (sc && +sc.dataset.v !== o.v) { gsap.to(o, { v: +sc.dataset.v, duration: 1.3, ease: 'power1.inOut', onUpdate: () => sc.textContent = Math.round(o.v) });
+                gsap.fromTo(sc, { scale: 1 }, { scale: 1.25, duration: .12, yoyo: true, repeat: 9, ease: 'sine.inOut' }); }
             });
-            old.filter(o => o.k > o.i).forEach(o => gsap.fromTo(o.r, { scale: 1 }, { scale: 1.05, yoyo: true, repeat: 1, duration: .35, ease: 'power2.out' }));
-          }, 1.3);
+          }, T1)
+          .to(rows, { y: 0, opacity: 1, duration: .9, ease: 'power3.inOut', stagger: .04 }, T2)
+          .add(() => {
+            if (moved) snd('pass', { vol: .7 });
+            old.filter(o => o.k > o.i).forEach(o => gsap.fromTo(o.r, { scale: 1 }, { scale: 1.06, yoyo: true, repeat: 1, duration: .3, ease: 'power2.out' }));
+          }, T2)
+          .add(() => {
+            const top = rows[0]; if (!top) return;
+            snd('lead', { vol: .8 });
+            let sh = top.querySelector('.sheen'); if (!sh) { sh = document.createElement('span'); sh.className = 'sheen'; sh.innerHTML = '<i></i>'; top.appendChild(sh); }
+            gsap.fromTo(sh.firstChild, { xPercent: -130 }, { xPercent: 260, duration: .9, ease: 'power2.inOut' });
+            gsap.fromTo(top, { scale: 1 }, { scale: 1.07, duration: .9, ease: 'elastic.out(1,.35)' });
+            gsap.fromTo(top, { filter: 'brightness(1.6)' }, { filter: 'brightness(1)', duration: 1.1, ease: 'power2.out' });
+            boom();
+          }, T3);
       } else { rows.forEach(r => { const sc = r.querySelector('.sc'); if (sc) sc.textContent = sc.dataset.v; }); tl.from(rows, { x: innerWidth * .7, duration: .8 }); }
     }
   }
