@@ -69,7 +69,7 @@ const VQ = (() => {
     set tempo(v) { this._tempo = v; if (this.src && this.loopKind !== 'count') this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
     load() {
       if (this.loading || !this.ctx) return this.loading;
-      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join'];
+      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join', 'sw2', 'sw3'];
       this.loading = Promise.all(names.map(n => fetch('audio/' + n + '.mp3?v=' + (window.VQ_V || ''))
         .then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((res, rej) => this.ctx.decodeAudioData(a, res, rej)))
         .then(b => { this.buf[n] = b; }).catch(() => {})));
@@ -121,7 +121,9 @@ const VQ = (() => {
     snare(t, v = 0.18) { this.noise(t, 0.16, v, 1800, 0.6); this.tone(190, t, 0.08, 'triangle', v * 0.6); },
     pop() { this.init(); if (this.play('join', { vol: .8 })) return; const t = this.t; this.tone(660, t, 0.12, 'sine', 0.3, 1320); this.tone(990, t + 0.05, 0.1, 'sine', 0.15); },
     tick(hi) { this.init(); if (this.buf.q) return; const t = this.t; this.tone(hi ? 1400 : 950, t, 0.06, 'square', hi ? 0.12 : 0.07); },
-    whoosh() { this.init(); if (this.play('whoosh', { vol: .7 })) return; const t = this.t; this.noise(t, 0.45, 0.25, 900, 0.5); this.tone(220, t, 0.4, 'sine', 0.12, 880); },
+    /* Свуш переходу: localStorage vq_sw = '2' | '3' (кіношні, ElevenLabs) або 'old' */
+    get swoosh() { try { return localStorage.getItem('vq_sw') || '2'; } catch (e) { return '2'; } },
+    whoosh() { this.init(); const v = this.swoosh; if (v !== 'old' && this.play('sw' + v, { vol: .8 })) return; if (this.play('whoosh', { vol: .7 })) return; const t = this.t; this.noise(t, 0.45, 0.25, 900, 0.5); this.tone(220, t, 0.4, 'sine', 0.12, 880); },
     gong() { this.init(); if (this.play('reveal')) return; const t = this.t; [196, 247, 294].forEach((f, i) => this.tone(f, t, 1.6, 'triangle', 0.18 - i * 0.03)); this.noise(t, 0.4, 0.15, 400, 0.4); },
     correct() { this.init(); if (this.play('correct')) return; const t = this.t; [523, 659, 784, 1047].forEach((f, i) => this.tone(f, t + i * 0.09, 0.35, 'triangle', 0.22)); },
     wrong() { this.init(); if (this.play('wrong', { vol: .8 })) return; const t = this.t; this.tone(330, t, 0.25, 'sawtooth', 0.12, 220); this.tone(262, t + 0.2, 0.4, 'sawtooth', 0.12, 160); },

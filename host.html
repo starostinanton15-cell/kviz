@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795428481">
+<link rel="stylesheet" href="style.css?v=1795428681">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -234,13 +234,13 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <script>/* Стиль і кольори одразу, до першого кадру (інакше миготить старий синьо-фіолетовий фон) */
-window.VQ_V = '1795428481';
+window.VQ_V = '1795428681';
 (function () { var g = {}; try { g = JSON.parse(localStorage.getItem('vq_host_game')) || {}; } catch (e) {}
   var q = new URLSearchParams(location.search).get('theme'), t = q || (localStorage.getItem('vq_def_glass3') ? g.theme : 'glass') || 'glass';
   if (!/^[a-z]+$/.test(t)) t = 'glass'; window.VQ_PAL0 = g.pal || 'pink';
   document.write('<link rel="stylesheet" id="tc" href="theme-' + t + '.css?v=' + window.VQ_V + '">'); })();
 </script>
-<link rel="stylesheet" href="pal-blue.css?v=1795428481">
+<link rel="stylesheet" href="pal-blue.css?v=1795428681">
 </head>
 <body>
 <script>document.body.dataset.pal = window.VQ_PAL0 === 'blue' ? 'blue' : 'pink';</script>
@@ -280,6 +280,7 @@ window.VQ_V = '1795428481';
         <h4>Кольори</h4>
         <div class="pals"><button class="pal pink" data-pal="pink"><i></i>Для дівчинки</button><button class="pal blue" data-pal="blue"><i></i>Для хлопця</button></div>
         <select id="sTheme" title="Стиль оформлення"></select>
+        <select id="sSw" title="Звук переходу між екранами"><option value="2">Свуш 2: з мерехтінням</option><option value="3">Свуш 3: швидкий проліт</option><option value="old">Свуш: старий</option></select>
       </div>
       <div class="card">
         <h4>Герой свята</h4>
@@ -338,18 +339,18 @@ window.VQ_V = '1795428481';
   </div>
 </div>
 
-<script>window.VQ_V = '1795428481'</script>
-<script src="lib/mqtt.min.js?v=1795428481"></script>
-<script src="lib/qrcode.js?v=1795428481"></script>
-<script src="common.js?v=1795428481"></script>
-<script src="lib/gsap.min.js?v=1795428481"></script>
-<script src="liquid.js?v=1795428481"></script>
-<script src="substance.js?v=1795428481"></script>
-<script src="sway.js?v=1795428481"></script>
-<script src="stagefx.js?v=1795428481"></script>
-<script src="doodle.js?v=1795428481"></script>
-<script src="nerdfx.js?v=1795428481"></script>
-<script src="fx.js?v=1795428481"></script>
+<script>window.VQ_V = '1795428681'</script>
+<script src="lib/mqtt.min.js?v=1795428681"></script>
+<script src="lib/qrcode.js?v=1795428681"></script>
+<script src="common.js?v=1795428681"></script>
+<script src="lib/gsap.min.js?v=1795428681"></script>
+<script src="liquid.js?v=1795428681"></script>
+<script src="substance.js?v=1795428681"></script>
+<script src="sway.js?v=1795428681"></script>
+<script src="stagefx.js?v=1795428681"></script>
+<script src="doodle.js?v=1795428681"></script>
+<script src="nerdfx.js?v=1795428681"></script>
+<script src="fx.js?v=1795428681"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -357,7 +358,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795428481"></script>
+<script src="questions.js?v=1795428681"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -526,7 +527,7 @@ function next() {
   if (G.phase === 'question') return endQuestion();
   if (G.phase === 'reveal') {
     if (G.qi >= G.qs.length - 1) return goFinal();
-    G.phase = 'board'; save(); render(); publish(); return;
+    G.phase = 'board'; save(); render(); publish(); Sfx.whoosh(); return;
   }
   if (G.phase === 'board') { G.qi++; return goIntro(); }
 }
@@ -880,6 +881,8 @@ document.querySelectorAll('.pal').forEach(b => b.onclick = () => {
   Q.pal = G.pal = b.dataset.pal; if (G.theme !== 'glass') G.theme = VQ.applyTheme('glass');
   applyPal(); saveQuiz(); publish(); buildSetup();
 });
+$('#sSw').value = Sfx.swoosh;
+$('#sSw').onchange = e => { ls.set('vq_sw', e.target.value); Sfx.whoosh(); };
 $('#sTheme').onchange = e => { const t = e.target.value; if (!t) return; G.theme = VQ.applyTheme(t); save(); publish(); buildSetup(); };
 $('#sHero').onclick = () => $('#fHero').click();
 $('#fHero').onchange = e => {
