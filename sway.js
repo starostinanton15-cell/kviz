@@ -16,7 +16,7 @@ window.SW = (() => {
   ];
   /* Списки елементів кешуємо й оновлюємо раз на ~0.5 с: querySelectorAll щокадру давав мікрофризи */
   let cache = null, fr = 0;
-  const grab = () => { cache = LAYERS.map(L => [L, [...document.querySelectorAll(L[0])]]); cache.hero = [...document.querySelectorAll('.hero img.main')]; cache.hero.forEach(el => el.style.transformOrigin = '50% 100%'); [].concat(...cache.map(c => c[1])).forEach(el => el.style.willChange = 'translate, rotate'); };
+  const grab = () => { cache = LAYERS.map(L => [L, [...document.querySelectorAll(L[0])]]); cache.hero = [...document.querySelectorAll('.hero img.main')]; cache.hero.forEach(el => el.style.transformOrigin = '50% 100%'); };
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if (document.hidden) return;
