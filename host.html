@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Квіз · екран ведучого</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="style.css?v=1795425790">
+<link rel="stylesheet" href="style.css?v=1795426531">
 <link rel="stylesheet" id="tf">
 <style>
   body { font-size: clamp(14px, 1.6vmin, 22px); }
@@ -232,7 +232,7 @@
   .toast { position: fixed !important; left: 50%; bottom: 3vmin; transform: translateX(-50%); background: #fff; color: #1a1033; padding: .8em 1.4em; border-radius: 999px; font-weight: 700; z-index: 60; }
 </style>
 <link rel="stylesheet" id="tc">
-<link rel="stylesheet" href="pal-blue.css?v=1795425790">
+<link rel="stylesheet" href="pal-blue.css?v=1795426531">
 </head>
 <body>
 <div class="bg"><i></i><i></i><i></i><div class="bgmarq"><div><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span><span>Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;Квіз&nbsp;✶&nbsp;Хто&nbsp;знає&nbsp;краще&nbsp;✶&nbsp;</span></div></div></div>
@@ -328,18 +328,18 @@
   </div>
 </div>
 
-<script>window.VQ_V = '1795425790'</script>
-<script src="lib/mqtt.min.js?v=1795425790"></script>
-<script src="lib/qrcode.js?v=1795425790"></script>
-<script src="common.js?v=1795425790"></script>
-<script src="lib/gsap.min.js?v=1795425790"></script>
-<script src="liquid.js?v=1795425790"></script>
-<script src="substance.js?v=1795425790"></script>
-<script src="sway.js?v=1795425790"></script>
-<script src="stagefx.js?v=1795425790"></script>
-<script src="doodle.js?v=1795425790"></script>
-<script src="nerdfx.js?v=1795425790"></script>
-<script src="fx.js?v=1795425790"></script>
+<script>window.VQ_V = '1795426531'</script>
+<script src="lib/mqtt.min.js?v=1795426531"></script>
+<script src="lib/qrcode.js?v=1795426531"></script>
+<script src="common.js?v=1795426531"></script>
+<script src="lib/gsap.min.js?v=1795426531"></script>
+<script src="liquid.js?v=1795426531"></script>
+<script src="substance.js?v=1795426531"></script>
+<script src="sway.js?v=1795426531"></script>
+<script src="stagefx.js?v=1795426531"></script>
+<script src="doodle.js?v=1795426531"></script>
+<script src="nerdfx.js?v=1795426531"></script>
+<script src="fx.js?v=1795426531"></script>
 <script>
 /* Якщо браузер підсунув старі файли з кешу: одне перезавантаження зі свіжими */
 if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
@@ -347,7 +347,7 @@ if (!window.VQ || !VQ.applyTheme || !VQ.kin) {
 } else { try { sessionStorage.removeItem('vq_rl'); } catch (e) {} }
 window.addEventListener('error', e => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#fff;color:#b00;font:12px monospace;padding:6px 10px;border-radius:8px;max-width:90vw'; d.textContent = 'Помилка: ' + e.message; document.body && document.body.appendChild(d); });
 </script>
-<script src="questions.js?v=1795425790"></script>
+<script src="questions.js?v=1795426531"></script>
 <script>
 const { Sfx, esc } = VQ;
 const LS_GAME = 'vq_host_game', LS_Q = 'vq_questions', LS_MUTE = 'vq_mute';
@@ -527,13 +527,13 @@ function startQuestion() {
   clearTimeout(tmr);
   const q = G.qs[G.qi];
   G.phase = 'question'; G.answers = {}; G.qEnd = Date.now() + q.t * 1000; save(); render(); publish();
-  Sfx.loop('think'); Sfx.tempo = 1;
+  Sfx.countdown(q.t);
 }
 function endQuestion() {
   if (G.phase !== 'question') return;
   const rk = ranking(); G.prevRank = Object.fromEntries(rk.map(p => [p.id, p.rank]));
   for (const id in G.answers) if (G.players[id]) G.players[id].score += G.answers[id].pts;
-  G.phase = 'reveal'; save(); Sfx.stopLoop(); Sfx.gong();
+  G.phase = 'reveal'; save(); if (!Sfx.endCountdown(Date.now() >= G.qEnd - 250)) Sfx.gong();
   render(); publish();
   setTimeout(() => Sfx.correct(), 700);
 }
@@ -602,7 +602,7 @@ function drawInner() {
       const upd = () => {
         const left = Math.max(0, G.qEnd - Date.now()), s = Math.ceil(left / 1000);
         $('#tn').textContent = s; $("#tcirc").style.strokeDashoffset = 276.5 * (1 - left / (q.t * 1000)); $('#tl').style.transform = `scaleX(${left / (q.t * 1000)})`;
-        if (s !== lastS) { lastS = s; if (s <= 5 && s > 0) { const tm = $('#timer'); if (tm) tm.classList.add('low'); Sfx.tick(s <= 3); Sfx.tempo = 1.25; } }
+        if (s !== lastS) { lastS = s; if (s <= 5 && s > 0) { const tm = $('#timer'); if (tm) tm.classList.add('low'); Sfx.tick(s <= 3); } }
         if (left <= 0) endQuestion();
       };
       upd(); tick = setInterval(upd, 100);
@@ -670,7 +670,7 @@ function lobbyNames() {
     box.appendChild(c);
   }
 }
-function updateAnswered() { const e = $('#ansN'); if (e) { e.textContent = Object.keys(G.answers).length; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } Sfx.tick(false); }
+function updateAnswered() { const e = $('#ansN'); if (e) { e.textContent = Object.keys(G.answers).length; e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } if (Sfx.buf.join) Sfx.play('join', { vol: .35 }); else Sfx.tick(false); }
 function countUp() {
   const els = [...stage.querySelectorAll('.sc[data-v]')], t0 = performance.now();
   (function f(now) { const k = Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - k, 3); els.forEach(x => x.textContent = Math.round(x.dataset.v * e)); if (k < 1) requestAnimationFrame(f); })(t0);
@@ -928,7 +928,7 @@ const soundLabel = () => $('#bSound').textContent = Sfx.muted ? '🔇 Без з�
 soundLabel();
 $('#bSound').onclick = () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); ls.set(LS_MUTE, Sfx.muted ? '1' : '0'); soundLabel(); };
 $('#bFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
-document.addEventListener('pointerdown', () => { Sfx.init(); if (G.phase === 'lobby' && !Sfx.loopKind) Sfx.loop('lobby'); }, { once: false });
+document.addEventListener('pointerdown', () => { Sfx.init(); if (G.phase === 'lobby' && !Sfx.loopKind) Sfx.loop('lobby'); if (G.phase === 'question' && !Sfx.loopKind) Sfx.countdown((G.qEnd - Date.now()) / 1000); }, { once: false });
 document.addEventListener('keydown', e => {
   if (isSetup() || $('#editor').classList.contains('on') || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (e.key === 's' || e.key === 'S' || e.key === 'і' || e.key === 'І' || e.key === 'ы') { openSetup(); return; }

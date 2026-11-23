@@ -66,10 +66,10 @@ const VQ = (() => {
     /* Справжні треки й ефекти (ElevenLabs, папка audio/). Поки не завантажились — синтез як раніше */
     buf: {}, loading: null, src: null, mgain: null,
     get tempo() { return this._tempo; },
-    set tempo(v) { this._tempo = v; if (this.src) this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
+    set tempo(v) { this._tempo = v; if (this.src && this.loopKind !== 'count') this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
     load() {
       if (this.loading || !this.ctx) return this.loading;
-      const names = ['lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join'];
+      const names = ['q', 'lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join'];
       this.loading = Promise.all(names.map(n => fetch('audio/' + n + '.mp3?v=' + (window.VQ_V || ''))
         .then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((res, rej) => this.ctx.decodeAudioData(a, res, rej)))
         .then(b => { this.buf[n] = b; }).catch(() => {})));
@@ -120,7 +120,7 @@ const VQ = (() => {
     hat(t, v = 0.06) { this.noise(t, 0.05, v, 8000, 1); },
     snare(t, v = 0.18) { this.noise(t, 0.16, v, 1800, 0.6); this.tone(190, t, 0.08, 'triangle', v * 0.6); },
     pop() { this.init(); if (this.play('join', { vol: .8 })) return; const t = this.t; this.tone(660, t, 0.12, 'sine', 0.3, 1320); this.tone(990, t + 0.05, 0.1, 'sine', 0.15); },
-    tick(hi) { this.init(); const t = this.t; this.tone(hi ? 1400 : 950, t, 0.06, 'square', hi ? 0.12 : 0.07); },
+    tick(hi) { this.init(); if (this.buf.q) return; const t = this.t; this.tone(hi ? 1400 : 950, t, 0.06, 'square', hi ? 0.12 : 0.07); },
     whoosh() { this.init(); if (this.play('whoosh', { vol: .7 })) return; const t = this.t; this.noise(t, 0.45, 0.25, 900, 0.5); this.tone(220, t, 0.4, 'sine', 0.12, 880); },
     gong() { this.init(); if (this.play('reveal')) return; const t = this.t; [196, 247, 294].forEach((f, i) => this.tone(f, t, 1.6, 'triangle', 0.18 - i * 0.03)); this.noise(t, 0.4, 0.15, 400, 0.4); },
     correct() { this.init(); if (this.play('correct')) return; const t = this.t; [523, 659, 784, 1047].forEach((f, i) => this.tone(f, t + i * 0.09, 0.35, 'triangle', 0.22)); },
@@ -150,6 +150,25 @@ const VQ = (() => {
       if (this.buf[file]) return this._track(file, this.t + .05, true);
       if (this.loading) { const my = kind; this.loading.then(() => { if (this.loopKind === my && this.buf[file] && !this.src) { clearInterval(this.loopTimer); this.loopTimer = null; this._track(file, this.t + .05, true); } }); }
       this.loopTimer = setInterval(() => this._sched(), 25);
+    },
+    /* Відлік питання: таймер Антона (audio/timer.mp3, удар «час вийшов» на 30.05 с) + мелодія в C# мінорі 120 BPM = audio/q.mp3.
+       Стартуємо з такого місця, щоб удар припав рівно на кінець часу. Довше 30 с: спершу крутимо середину 1.07–25.07 с. */
+    countdown(left) {
+      this.init(); if (!this.ctx) return;
+      const b = this.buf.q;
+      if (!b) { this.loop('think'); if (this.loading && !this._cdWait) { this._cdWait = 1; const t0 = this.t, L = left; this.loading.then(() => { this._cdWait = 0; if (this.loopKind === 'think' && this.buf.q) this.countdown(L - (this.t - t0)); }); } return; }
+      this.stopLoop(); this.loopKind = 'count';
+      if (!this.mgain) { this.mgain = this.ctx.createGain(); this.mgain.gain.value = .6; this.mgain.connect(this.out); }
+      const HIT = 30.05, now = this.t + .05, mk = () => { const s = this.ctx.createBufferSource(), g = this.ctx.createGain(); s.buffer = b; s.connect(g); g.connect(this.out); (this.srcs = this.srcs || []).push({ s, g }); return [s, g]; };
+      if (left <= HIT) { const [s] = mk(); s.start(now, Math.max(0, HIT - left)); this.src = s; return; }
+      const lead = left - HIT, [a, ga] = mk(), [c, gc] = mk();
+      a.loop = true; a.loopStart = 1.07; a.loopEnd = 25.07; a.start(now, 1.07); ga.gain.setValueAtTime(1, now + lead - .02); ga.gain.linearRampToValueAtTime(0.0001, now + lead + .3); a.stop(now + lead + .35);
+      gc.gain.setValueAtTime(0.0001, now + lead); gc.gain.linearRampToValueAtTime(1, now + lead + .3); c.start(now + lead, 0); this.src = c;
+    },
+    /* Кінець питання: якщо час вийшов сам — даємо таймеру дозвучати його удар; якщо зупинили раніше — гасимо */
+    endCountdown(natural) {
+      if (this.loopKind === 'count' && natural) { this.loopKind = null; this.src = null; this.srcs = []; clearTimeout(this.loopTimer); return true; }
+      this.stopLoop(); return false;
     },
     /* Трек по колу з плавним переходом кінця в початок */
     _track(n, at, first) {
