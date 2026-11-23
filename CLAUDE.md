@@ -20,7 +20,7 @@
 - 3D (стилі show/glass): `liquid.js` — рідке скло на WebGL (краплі-метаболи, заломлення, тікають від курсора; `LQ.start/stop/pulse`, запускає `applyTheme`). `fx.js` — режисура на GSAP (`lib/gsap.min.js`): `FX.enter(фаза, stage)` після кожного draw, `FX.podium`, `FX.phone`. Під `body.gs` CSS-анімації й transition на transform/opacity вимкнені, бо ламають GSAP.
 - Фон «Скло-шоу» (з 2026-11-21): `stagefx.js` (`ST.start/stop/pulse`, Canvas 2D) — прожектори, серпантин, іскри на теплому студійному градієнті. Згодом (2026-11-21) у show повернули бульбашки й WebGL-скло (`liquid.js`) і старий фон; `stagefx.js` лишився, але ніде не вмикається. Сплески через `boom()` у fx.js.
 - Телефон (2026-11-21): замість емодзі скляні кулі з SVG-іконками (`ICONS`/`ico()` в index.html, градієнт #ig з кольорів палітри; медалі 1–3 як золота/срібна/бронзова куля з цифрою). Для плавності на телефонах: без backdrop-filter і вічних анімацій на `#scr .opt`, поява кнопок без 3D (FX.phone), фон SB scale .25 і 30 fps.
-- Звуки синтезуються WebAudio (`VQ.Sfx`), конфеті — canvas.
+- Звуки (2026-11-23): справжні треки й ефекти, згенеровані в ElevenLabs (Music API + sound-generation, api.elevenlabs.io доступний з хмари через проксі), у папці `audio/`: lobby (60 с), think (30 с), board (30 с) — петлі з кросфейдом 2 с (`Sfx._track`); reveal (кінець часу/кімвал), correct, wrong, drum, fanfare, whoosh, join. Нормалізовано ffmpeg loudnorm. `VQ.Sfx` вантажить їх при першому кліку; поки не завантажились — старий синтез. tick лишився синтезом. Конфеті — canvas.
 - Кеш: у посиланнях на js/css стоїть `?v=<число>`. При кожному викладанні онови число в host.html та index.html (і `window.VQ_V`), інакше браузери тягнуть старе.
 
 ## Перевірка

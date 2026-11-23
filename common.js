@@ -62,7 +62,24 @@ const VQ = (() => {
 
   /* ---------- Звуки (синтез, без файлів) ---------- */
   const Sfx = {
-    ctx: null, out: null, muted: false, loopTimer: null, loopKind: null, step: 0, nextT: 0, tempo: 1,
+    ctx: null, out: null, muted: false, loopTimer: null, loopKind: null, step: 0, nextT: 0, _tempo: 1,
+    /* Справжні треки й ефекти (ElevenLabs, папка audio/). Поки не завантажились — синтез як раніше */
+    buf: {}, loading: null, src: null, mgain: null,
+    get tempo() { return this._tempo; },
+    set tempo(v) { this._tempo = v; if (this.src) this.src.playbackRate.setTargetAtTime(v > 1 ? 1.06 : 1, this.t, .4); },
+    load() {
+      if (this.loading || !this.ctx) return this.loading;
+      const names = ['lobby', 'think', 'board', 'reveal', 'correct', 'wrong', 'drum', 'fanfare', 'whoosh', 'join'];
+      this.loading = Promise.all(names.map(n => fetch('audio/' + n + '.mp3?v=' + (window.VQ_V || ''))
+        .then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(a => new Promise((res, rej) => this.ctx.decodeAudioData(a, res, rej)))
+        .then(b => { this.buf[n] = b; }).catch(() => {})));
+      return this.loading;
+    },
+    play(n, { vol = 1, rate = 1, at } = {}) {
+      const b = this.buf[n]; if (!b || !this.ctx) return false;
+      const s = this.ctx.createBufferSource(), g = this.ctx.createGain(); s.buffer = b; s.playbackRate.value = rate; g.gain.value = vol;
+      s.connect(g); g.connect(this.out); s.start(at || this.t); return true;
+    },
     init() {
       if (!this.ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -72,6 +89,7 @@ const VQ = (() => {
         this.out.gain.value = this.muted ? 0 : 0.55;
         const comp = this.ctx.createDynamicsCompressor();
         this.out.connect(comp); comp.connect(this.ctx.destination);
+        this.load();
       }
       if (this.ctx.state === 'suspended') this.ctx.resume();
     },
@@ -101,20 +119,22 @@ const VQ = (() => {
     kick(t, v = 0.5) { this.tone(140, t, 0.25, 'sine', v, 40); },
     hat(t, v = 0.06) { this.noise(t, 0.05, v, 8000, 1); },
     snare(t, v = 0.18) { this.noise(t, 0.16, v, 1800, 0.6); this.tone(190, t, 0.08, 'triangle', v * 0.6); },
-    pop() { this.init(); const t = this.t; this.tone(660, t, 0.12, 'sine', 0.3, 1320); this.tone(990, t + 0.05, 0.1, 'sine', 0.15); },
+    pop() { this.init(); if (this.play('join', { vol: .8 })) return; const t = this.t; this.tone(660, t, 0.12, 'sine', 0.3, 1320); this.tone(990, t + 0.05, 0.1, 'sine', 0.15); },
     tick(hi) { this.init(); const t = this.t; this.tone(hi ? 1400 : 950, t, 0.06, 'square', hi ? 0.12 : 0.07); },
-    whoosh() { this.init(); const t = this.t; this.noise(t, 0.45, 0.25, 900, 0.5); this.tone(220, t, 0.4, 'sine', 0.12, 880); },
-    gong() { this.init(); const t = this.t; [196, 247, 294].forEach((f, i) => this.tone(f, t, 1.6, 'triangle', 0.18 - i * 0.03)); this.noise(t, 0.4, 0.15, 400, 0.4); },
-    correct() { this.init(); const t = this.t; [523, 659, 784, 1047].forEach((f, i) => this.tone(f, t + i * 0.09, 0.35, 'triangle', 0.22)); },
-    wrong() { this.init(); const t = this.t; this.tone(330, t, 0.25, 'sawtooth', 0.12, 220); this.tone(262, t + 0.2, 0.4, 'sawtooth', 0.12, 160); },
+    whoosh() { this.init(); if (this.play('whoosh', { vol: .7 })) return; const t = this.t; this.noise(t, 0.45, 0.25, 900, 0.5); this.tone(220, t, 0.4, 'sine', 0.12, 880); },
+    gong() { this.init(); if (this.play('reveal')) return; const t = this.t; [196, 247, 294].forEach((f, i) => this.tone(f, t, 1.6, 'triangle', 0.18 - i * 0.03)); this.noise(t, 0.4, 0.15, 400, 0.4); },
+    correct() { this.init(); if (this.play('correct')) return; const t = this.t; [523, 659, 784, 1047].forEach((f, i) => this.tone(f, t + i * 0.09, 0.35, 'triangle', 0.22)); },
+    wrong() { this.init(); if (this.play('wrong', { vol: .8 })) return; const t = this.t; this.tone(330, t, 0.25, 'sawtooth', 0.12, 220); this.tone(262, t + 0.2, 0.4, 'sawtooth', 0.12, 160); },
     drumroll(dur = 2.5) {
-      this.init(); const t = this.t;
+      this.init(); const b = this.buf.drum;
+      if (b) { this.play('drum', { rate: Math.max(.7, b.duration / dur) }); return dur; }
+      const t = this.t;
       for (let x = 0; x < dur; x += 0.045) this.snare(t + x, 0.05 + 0.18 * (x / dur));
       return dur;
     },
-    cymbal() { this.init(); const t = this.t; this.noise(t, 1.4, 0.3, 6000, 0.3); this.kick(t, 0.6); },
+    cymbal() { this.init(); if (this.play('reveal', { vol: .9 })) return; const t = this.t; this.noise(t, 1.4, 0.3, 6000, 0.3); this.kick(t, 0.6); },
     fanfare() {
-      this.init(); const t = this.t;
+      this.init(); if (this.play('fanfare')) return; const t = this.t;
       const n = [[523, 0, .18], [523, .18, .18], [523, .36, .18], [659, .54, .5], [587, .95, .18], [659, 1.13, .18], [784, 1.31, 1.1]];
       n.forEach(([f, s, d]) => { this.tone(f, t + s, d, 'sawtooth', 0.12); this.tone(f * 2, t + s, d, 'triangle', 0.08); });
       [262, 330, 392].forEach(f => this.tone(f, t + 1.31, 1.2, 'triangle', 0.1));
@@ -125,17 +145,38 @@ const VQ = (() => {
     loop(kind) {
       this.init(); if (!this.ctx) return;
       if (this.loopKind === kind) return;
-      this.stopLoop(); this.loopKind = kind; this.step = 0; this.nextT = this.t + 0.08; this.tempo = 1;
+      this.stopLoop(); this.loopKind = kind; this.step = 0; this.nextT = this.t + 0.08; this._tempo = 1;
+      const file = { lobby: 'lobby', think: 'think', board: 'board' }[kind];
+      if (this.buf[file]) return this._track(file, this.t + .05, true);
+      if (this.loading) { const my = kind; this.loading.then(() => { if (this.loopKind === my && this.buf[file] && !this.src) { clearInterval(this.loopTimer); this.loopTimer = null; this._track(file, this.t + .05, true); } }); }
       this.loopTimer = setInterval(() => this._sched(), 25);
     },
-    stopLoop() { clearInterval(this.loopTimer); this.loopTimer = null; this.loopKind = null; },
+    /* Трек по колу з плавним переходом кінця в початок */
+    _track(n, at, first) {
+      const b = this.buf[n], XF = 2, s = this.ctx.createBufferSource(), g = this.ctx.createGain();
+      s.buffer = b; s.playbackRate.value = this._tempo > 1 ? 1.06 : 1;
+      if (!this.mgain) { this.mgain = this.ctx.createGain(); this.mgain.gain.value = .6; this.mgain.connect(this.out); }
+      s.connect(g); g.connect(this.mgain);
+      const d = b.duration / s.playbackRate.value;
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(1, at + (first ? .6 : XF));
+      g.gain.setValueAtTime(1, at + d - XF); g.gain.linearRampToValueAtTime(0.0001, at + d);
+      s.start(at); s.stop(at + d + .05);
+      (this.srcs = this.srcs || []).push({ s, g }); this.src = s;
+      const nextAt = at + d - XF;
+      this.loopTimer = setTimeout(() => { if (this.src === s) this._track(n, nextAt, false); }, Math.max(0, (nextAt - this.t - .5) * 1000));
+    },
+    stopLoop() {
+      clearInterval(this.loopTimer); clearTimeout(this.loopTimer); this.loopTimer = null; this.loopKind = null; this.src = null;
+      (this.srcs || []).forEach(({ s, g }) => { try { g.gain.cancelScheduledValues(this.t); g.gain.setValueAtTime(g.gain.value, this.t); g.gain.linearRampToValueAtTime(0.0001, this.t + .5); s.stop(this.t + .55); } catch (e) {} });
+      this.srcs = [];
+    },
     _sched() {
       const bpm = (this.loopKind === 'think' ? 128 : 112) * this.tempo, st = 60 / bpm / 4;
       while (this.nextT < this.t + 0.12) { this._play(this.step, this.nextT, st); this.step++; this.nextT += st; }
     },
     _play(s, t, st) {
       const i = s % 16, bar = Math.floor(s / 16) % 4;
-      if (this.loopKind === 'lobby') {
+      if (this.loopKind !== 'think') {
         const chords = [[261.6, 329.6, 392], [196, 246.9, 293.7], [220, 261.6, 329.6], [174.6, 220, 261.6]];
         const c = chords[bar];
         if (i % 4 === 0) this.kick(t, 0.32);
