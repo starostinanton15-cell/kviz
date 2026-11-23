@@ -169,6 +169,11 @@ const VQ = (() => {
     /* Кінець питання: якщо час вийшов сам — даємо таймеру дозвучати його удар; якщо зупинили раніше — гасимо */
     endCountdown(natural) {
       if (this.loopKind === 'count' && natural) { this.loopKind = null; this.src = null; this.srcs = []; clearTimeout(this.loopTimer); return true; }
+      /* Зупинили раніше: замість окремого дзвону — фінальний удар з таймера Антона (q.mp3 з 29.9 с, удар на 30.05) */
+      if (this.loopKind === 'count' && this.buf.q) {
+        this.stopLoop(); const s = this.ctx.createBufferSource(), g = this.ctx.createGain(); s.buffer = this.buf.q; s.connect(g); g.connect(this.out); s.start(this.t + .02, 29.9);
+        return true;
+      }
       this.stopLoop(); return false;
     },
     /* Трек по колу з плавним переходом кінця в початок */
